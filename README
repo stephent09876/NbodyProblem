@@ -1,0 +1,11 @@
+N-body problem simulator
+
+This guide will help you set up the repository from scratch. I used a clean install of WSL to 
+develop this project.
+
+
+
+Dependencies that need to be installed:
+g++ (? maybe, if we decide to code in cpp)
+cmake (same here)
+make (same here)
