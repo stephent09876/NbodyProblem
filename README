@@ -15,7 +15,7 @@ For the sfml_demo.cpp to work type in the following commands:
 
     sudo apt update 
 
-    sudo apt install g++ cmake make
+    sudo apt install g++ cmake make    # just in case you have a totally clean install of WSL like me
 
     sudo apt install \
         libxrandr-dev \
@@ -39,6 +39,9 @@ Then run the program:
     ./test
 
 You should see a screen pop up with a green circle
+
+
+OpenGL demo next? a python base graphics library demo next?
 
 
 
