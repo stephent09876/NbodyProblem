@@ -9,3 +9,36 @@ Dependencies that need to be installed:
 g++ (? maybe, if we decide to code in cpp)
 cmake (same here)
 make (same here)
+
+
+For the sfml_demo.cpp to work type in the following commands:
+
+    sudo apt update 
+
+    sudo apt install g++ cmake make
+
+    sudo apt install \
+        libxrandr-dev \
+        libxcursor-dev \
+        libxi-dev \
+        libudev-dev \
+        libfreetype-dev \
+        libflac-dev \
+        libvorbis-dev \
+        libgl1-mesa-dev \
+        libegl1-mesa-dev \
+        libfreetype-dev
+
+    sudo apt install libsfml-dev     # this is the graphics library
+
+Currently I have no make file to make the compile command simpler so type this in to compile the program:
+
+    g++ sfml_demo.cpp -o test -lsfml-graphics -lsfml-window -lsfml-system
+
+Then run the program:
+    ./test
+
+You should see a screen pop up with a green circle
+
+
+
