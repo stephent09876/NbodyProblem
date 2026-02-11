@@ -29,10 +29,9 @@ int main()
     shape.setPosition(sf::Vector2f(0.0, 0.0));
     shape.setFillColor(sf::Color::White);
 
-    // position variables to update
+    // position and velocity variables
     float x_pos = 0.0;
     float y_pos = 0.0;
-
     float x_vel = 2.0;
     float y_vel = 2.0;
 
