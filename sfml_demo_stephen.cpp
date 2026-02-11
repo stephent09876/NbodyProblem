@@ -53,7 +53,7 @@ int main()
         window.draw(shape);
         window.display();
 
-        // update velocity if circle bounces of boundary
+        // update velocity if circle bounces off a window boundary
         if (x_pos < 0.0 || x_pos > (static_cast<float>(window_length) - 2.0*r)) {
             x_vel = -1.0 * x_vel;
         }
