@@ -1,3 +1,6 @@
+#########################################################
+# This cmake file is meant to compile the sfml 3.0 code
+#########################################################
 cmake_minimum_required(VERSION 3.28)
 project(CMakeSFMLProject LANGUAGES CXX)
 

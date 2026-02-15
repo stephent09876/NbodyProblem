@@ -5,12 +5,12 @@
 #include <vector>
 
 class Particle {
-public:
-    sf::CircleShape shape;
-    sf::Color color;
+public: 
     float mass;
     float x, y;
     float velocityX, velocityY;
+    sf::CircleShape shape;
+    sf::Color color;
 
     // Added a default constructor so std::vector<Particle> particles(numParticles) works
     Particle() : mass(1.0f), x(0), y(0), velocityX(0), velocityY(0) {} 
