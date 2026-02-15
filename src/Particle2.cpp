@@ -1,4 +1,10 @@
-#include "Particle.hpp"
+/**************************************************************************************************
+ * File: Particle2.cpp
+ * Date: 2/15/2025
+ * Description: This file implements the particle class that is compilable with SFML 3.0
+ **************************************************************************************************/
+
+#include "Particle2.hpp"
 #include <cmath> // For sqrt if you want to scale radius by area
 
 Particle::Particle(float mass, sf::Color color) : mass(mass), color(color) {
@@ -6,7 +12,7 @@ Particle::Particle(float mass, sf::Color color) : mass(mass), color(color) {
     // Using sqrt(mass) often looks more natural as it represents volume/area
     float radius = std::sqrt(mass) * 2.0f; 
     shape.setRadius(radius);
-    shape.setOrigin(radius, radius); // Center the origin for better physics
+    shape.setOrigin(sf::Vector2f(radius, radius)); // Center the origin for better physics
     shape.setFillColor(color);
 
     // Initial random positions within the 1300x800 window
@@ -26,5 +32,5 @@ void Particle::update(float deltaTime) {
     if (x < 0 || x > 1300) velocityX *= -1.f;
     if (y < 0 || y > 800) velocityY *= -1.f;
 
-    shape.setPosition(x, y);
+    shape.setPosition(sf::Vector2f(x, y));
 }

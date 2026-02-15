@@ -8,7 +8,7 @@ CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -g
 
 # Target executable name
-TARGET = testProgram
+TARGET = nBodyProject
 
 # Source files
 SRCS = sfml_2_6_1_demo.cpp Particle.cpp

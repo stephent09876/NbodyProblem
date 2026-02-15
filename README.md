@@ -14,7 +14,44 @@ the differences in the developers' environments were discovered in the middle of
 so both compilation methods are described here.
 
 ## SFML 3.0 guide:
-TODO: put detailed instructions here!
+This is the preferred method to compile the code because of the ease of using CMake no matter the 
+development environment. This method uses the templated SFML project repository here:
+- [SFML template repository](https://github.com/SFML/cmake-sfml-project)
+
+There are plenty of tutorials out there that help you run Cmake in your IDE of choice: 
+   - [VS Code](https://code.visualstudio.com) via the [CMake extension](https://code.visualstudio.com/docs/cpp/cmake-linux)
+   - [Visual Studio](https://docs.microsoft.com/en-us/cpp/build/cmake-projects-in-visual-studio?view=msvc-170)
+   - [CLion](https://www.jetbrains.com/clion/features/cmake-support.html)
+   - [Qt Creator](https://doc.qt.io/qtcreator/creator-project-cmake.html)
+
+Compiling the program in an Ubuntu environment with the linux tutorial is very straightforward as well
+First install all SFML dependencies:
+```
+    sudo apt update
+    sudo apt install \
+        libxrandr-dev \
+        libxcursor-dev \
+        libxi-dev \
+        libudev-dev \
+        libfreetype-dev \
+        libflac-dev \
+        libvorbis-dev \
+        libgl1-mesa-dev \
+        libegl1-mesa-dev \
+        libfreetype-dev
+```
+Next source our custom alias file that we have created
+```
+    source bin/alias.sh
+```
+And use our custom alias to compile the program
+```
+    cmCP    # acronym stands for "CMake Compile Program"
+```
+Then simply run the test project executable
+```
+    ./nBodyProject
+```
 
 ## SFML 2.6.1 guide: 
 SFML 2.6.1 is the version that Ubuntu 24.04 automatically installs with the sudo-apt update command
@@ -57,7 +94,7 @@ In the root directory of this project simply call the "make" compilation command
 ```
 Now you can simply run the test program:
 ```
-    ./testProgram
+    ./nBodyProject
 ```
 In the terminal, enter the number of particles you want to generate and press enter. Once you are
 done running the progam, delete all the compilation objects and files which you can just call the make command 

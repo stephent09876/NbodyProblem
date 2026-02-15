@@ -2,9 +2,9 @@
 # This cmake file is meant to compile the sfml 3.0 code
 #########################################################
 cmake_minimum_required(VERSION 3.28)
-project(CMakeSFMLProject LANGUAGES CXX)
+project(nBodyProject)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 include(FetchContent)
 FetchContent_Declare(SFML
@@ -15,8 +15,16 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(main src/main.cpp )
-target_compile_features(main PRIVATE cxx_std_17)
-target_link_libraries(main PRIVATE SFML::Graphics)
+# add all source and include files
+set(SOURCES
+    src/sfml_3_0_demo.cpp
+    src/Particle2.cpp)
+
+add_executable(nBodyProject ${SOURCES})
+target_include_directories(nBodyProject PRIVATE include)
+target_compile_features(nBodyProject PRIVATE cxx_std_17)
+target_link_libraries(nBodyProject PRIVATE SFML::Graphics)
+
+
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT main)

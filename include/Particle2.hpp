@@ -1,3 +1,9 @@
+/**************************************************************************************************
+ * File: Particle2.hpp
+ * Date: 2/15/2025
+ * Description: This file implements the particle class that is compilable with SFML 3.0
+ **************************************************************************************************/
+
 #pragma once
 
 #include <SFML/Graphics.hpp>

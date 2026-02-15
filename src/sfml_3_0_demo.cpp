@@ -1,4 +1,4 @@
-#include "Particle.hpp"
+#include "Particle2.hpp"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
@@ -6,6 +6,7 @@
 
 int main() {
     sf::RenderWindow window(sf::VideoMode({1300, 800}), "Particle Demo");
+    window.setPosition(sf::Vector2i(10, 10)); 
     window.setFramerateLimit(60);
 
     int numParticles;
@@ -34,11 +35,11 @@ int main() {
     while (window.isOpen()) {
         float dt = clock.restart().asSeconds(); // Calculate time passed per frame
 
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
+        while ( const std::optional event = window.pollEvent() )
+        {
+            if ( event->is<sf::Event::Closed>() )
                 window.close();
-        }
+            }
 
         window.clear(sf::Color::Black);
         for (Particle& p : particles) {
@@ -49,3 +50,23 @@ int main() {
     }
     return 0;
 }
+
+// int main()
+// {
+// 	sf::RenderWindow window( sf::VideoMode( { 200, 200 } ), "SFML works!" );
+// 	sf::CircleShape shape( 100.f );
+// 	shape.setFillColor( sf::Color::Red );
+
+// 	while ( window.isOpen() )
+// 	{
+// 		while ( const std::optional event = window.pollEvent() )
+// 		{
+// 			if ( event->is<sf::Event::Closed>() )
+// 				window.close();
+// 		}
+
+// 		window.clear();
+// 		window.draw( shape );
+// 		window.display();
+// 	}
+// }
