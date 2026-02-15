@@ -8,16 +8,30 @@ Shahzaib Memon
 This guide will help you set up the repository from scratch. I used a clean install of WSL with
 Ubuntu 24.04 installed to develop this project. Currently there are two ways to compile and run the 
 program, mainly because of ongoing environment reconsiliation between developers in regards to our
-graphics library SFML. There is a compilation path that uses SFML 2.6.1 which is the following:
+graphics library SFML. The primary compilation path we will use is with SFML 3.0 that uses Cmake.
+We are currently in a transition period between this and the depreciated SFML 2.6.1 version because
+the differences in the developers' environments were discovered in the middle of the first sprint, 
+so both compilation methods are described here.
+
+## SFML 3.0 guide:
+TODO: put detailed instructions here!
 
 ## SFML 2.6.1 guide: 
+SFML 2.6.1 is the version that Ubuntu 24.04 automatically installs with the sudo-apt update command
+so this is how you compile the 2.6.1 version of our feature 1 program with this version (assuming 
+you are using Ubuntu 24.04 here).
 
 For the sfml_2_6_1_demo.cpp to work type in the following commands:
 ```
-    sudo apt update 
-
-    sudo apt install g++ cmake make    # just in case you have a totally clean install of WSL like me
-
+    sudo apt update
+```
+Just in case you have a fresh install of WSL like me, install the C++ compiler (we are using gcc) and
+the supporiting compilation packages
+```
+    sudo apt install g++ cmake make
+```
+Install SFML package dependencies:
+```
     sudo apt install \
         libxrandr-dev \
         libxcursor-dev \
@@ -29,9 +43,11 @@ For the sfml_2_6_1_demo.cpp to work type in the following commands:
         libgl1-mesa-dev \
         libegl1-mesa-dev \
         libfreetype-dev
+```
 
-    sudo apt install libsfml-dev     # this is the graphics library that will install the 2.6.1 version of your code (assuming you're running Ubuntu 24.04)
-
+Finally install the SFML graphics library (Ubuntu 24.04 will auto-install the 2.6.1 version)
+```
+    sudo apt install libsfml-dev
 ```
 
 Now we can compile and run the code. All compilation and linking is done very simply with a Makefile.
@@ -49,10 +65,13 @@ to do so:
 ```
     make spotless
 ```
-or if you sourced our alias.sh file...
+or you can source our alias.sh file for less typing on your end...
 ```
-    ms
+    source bin/alias.sh
+    ms                   # our custom alias for make spotless
 ```
+
+
 
 
 
