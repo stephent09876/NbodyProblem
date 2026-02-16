@@ -1,0 +1,23 @@
+This folder will contain all ai prompts used to help with code scaffolding and debugging. This file
+will provide explanation how the individual prompt files help assist us with this project
+
+
+FEATURE 1 AI USAGE:
+
+stephen_thorsell_library_recommendations.pdf:
+This AI prompt was used to help me get a feeling of what supporting libraries I needed to complete
+this project. I initially thought that OpenGL for the graphics and Eigen for the linear algebra
+would be my libraries of choice but I just wanted to double check with chatGPT. I gave a prompt about
+what our project was and ChatGPT independently recommended using SFML for graphics and Eigen for linear algebra
+(glad it unknowingly agreed with what I thought the linear algebra library should be). This prompt
+helped me choose SFML over the "more overkill" OpenGL graphics library.
+
+stephen_thorsell_Makefile_guide.pdf: 
+This AI prompt was used to help scaffold our Makefile for the legacy 2.6.1 version of the project. 
+The Makefile was edited to fit our file namings.
+
+
+Stephen_Thorsell_CMake_fetching_multiple_repositories.pdf:
+This AI prompt was to help me install the Eigen linear algebra library. The SFML template project
+repository that I pulled had the SFML installation built into the CMakeLists.txt file already but
+I had no idea how to add an extra repository to install in this manner.

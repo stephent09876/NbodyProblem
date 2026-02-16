@@ -14,7 +14,14 @@ FetchContent_Declare(SFML
     GIT_SHALLOW ON
     EXCLUDE_FROM_ALL
     SYSTEM)
-FetchContent_MakeAvailable(SFML)
+
+FetchContent_Declare(Eigen
+    GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+    GIT_TAG 5.0.1
+    GIT_SHALLOW ON
+    EXCLUDE_FROM_ALL
+    SYSTEM)
+FetchContent_MakeAvailable(SFML Eigen)
 
 # add all source and include files
 set(SOURCES
@@ -25,7 +32,6 @@ add_executable(nBodyProject ${SOURCES})
 target_include_directories(nBodyProject PRIVATE include)
 target_compile_features(nBodyProject PRIVATE cxx_std_17)
 target_link_libraries(nBodyProject PRIVATE SFML::Graphics)
-
-
+target_link_libraries(nBodyProject PRIVATE Eigen3::Eigen)
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT main)
