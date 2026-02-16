@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <Eigen/Dense>
 
 int main() {
     sf::RenderWindow window(sf::VideoMode({1300, 800}), "Particle Demo");
