@@ -3,8 +3,18 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <Eigen/Core>
 
 int main() {
+
+    Eigen::Matrix2d A;
+    A << 1, 2,
+         3, 4;
+
+    std::cout << "this is just a demo that Eigen works:" << std::endl;
+    std::cout << A << std::endl;
+    std::cout << std::endl;
+
     sf::RenderWindow window(sf::VideoMode({1300, 800}), "Particle Demo");
     window.setPosition(sf::Vector2i(10, 10)); 
     window.setFramerateLimit(60);
@@ -50,23 +60,3 @@ int main() {
     }
     return 0;
 }
-
-// int main()
-// {
-// 	sf::RenderWindow window( sf::VideoMode( { 200, 200 } ), "SFML works!" );
-// 	sf::CircleShape shape( 100.f );
-// 	shape.setFillColor( sf::Color::Red );
-
-// 	while ( window.isOpen() )
-// 	{
-// 		while ( const std::optional event = window.pollEvent() )
-// 		{
-// 			if ( event->is<sf::Event::Closed>() )
-// 				window.close();
-// 		}
-
-// 		window.clear();
-// 		window.draw( shape );
-// 		window.display();
-// 	}
-// }
