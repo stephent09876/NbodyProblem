@@ -15,7 +15,7 @@ so both compilation methods are described here.
 
 ## SFML 3.0 guide:
 This is the preferred method to compile the code because of the ease of using CMake no matter the 
-development environment. This method uses the templated SFML project repository here:
+development environment. This method uses the template SFML project repository here:
 - [SFML template repository](https://github.com/SFML/cmake-sfml-project)
 
 There are plenty of tutorials out there that help you run Cmake in your IDE of choice: 
@@ -24,11 +24,14 @@ There are plenty of tutorials out there that help you run Cmake in your IDE of c
    - [CLion](https://www.jetbrains.com/clion/features/cmake-support.html)
    - [Qt Creator](https://doc.qt.io/qtcreator/creator-project-cmake.html)
 
-Compiling the program in an Ubuntu environment with the linux tutorial is very straightforward as well
+Compiling the program in an Ubuntu environment with the linux tutorial is very straightforward as well.
 First install all SFML dependencies:
 ```
     sudo apt update
-    sudo apt install \
+
+    sudo apt install g++ cmake make   # just in case you have a fresh install of WSL like me
+
+    sudo apt install \ 
         libxrandr-dev \
         libxcursor-dev \
         libxi-dev \
