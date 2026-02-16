@@ -1,3 +1,8 @@
+# NBODY PROBLEM DEVELOPER'S NOTE:
+   This is the readme file that came with the clone of the SFML template project repository. 
+   Most of the information is irrelevant to the project or redundant to what is in our own readme.
+   This is archived here for good record keeping purposes. -Stephen Thorsell
+
 # CMake SFML Project Template
 
 This repository template should allow for a fast and hassle-free kick start of your next SFML project using CMake.

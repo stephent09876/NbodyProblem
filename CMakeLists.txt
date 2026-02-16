@@ -1,6 +1,7 @@
-#########################################################
-# This cmake file is meant to compile the sfml 3.0 code
-#########################################################
+####################################################################################################
+# This cmake file is meant to compile the sfml 3.0 code. Original template came from the SFML 
+# template repository and edited to fit our project with some AI assistance
+####################################################################################################
 cmake_minimum_required(VERSION 3.28)
 project(nBodyProject)
 

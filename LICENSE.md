@@ -1,3 +1,9 @@
+# NBODY PROBLEM DEVELOPER NOTE:
+This liscence is here simply because we have cloned in the SFML graphics library's template project.
+This allows us an easy development environment that is compatible across different operating 
+systems. Leaving this license information in as a good practice for the legal ramifications of 
+using open source code - Stephen Thorsell
+
 # CMake SFML Project Licenses
 
 *This software is available under 2 licenses -- choose whichever you prefer.*
@@ -29,7 +35,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 ## MIT License
 
-Copyright (c) 2022 Lukas Dürrenberger
+Copyright (c) 2022 Lukas Dï¿½rrenberger
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
