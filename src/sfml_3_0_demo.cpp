@@ -7,9 +7,18 @@
 
 int main() {
 
-    Eigen::Matrix2d A;
-    A << 1, 2,
-         3, 4;
+    Eigen::Vector2f A;
+    A << 3, 4;
+
+    Eigen::Vector2f B;
+    B << 7, 6;
+
+    Eigen::Vector2f C = A - B;
+
+    float vector_mag = C.norm();
+
+    std::cout << C << std::endl;
+    std::cout << vector_mag << std::endl;
 
     std::cout << "this is just a demo that Eigen works:" << std::endl;
     std::cout << A << std::endl;

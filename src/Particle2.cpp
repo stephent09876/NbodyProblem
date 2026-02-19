@@ -25,6 +25,8 @@ Particle::Particle(float mass, sf::Color color) : mass(mass), color(color) {
 }
 
 void Particle::update(float deltaTime) {
+
+    // TODO: calculate velocity from acceleration as well
     x += velocityX * deltaTime;
     y += velocityY * deltaTime;
 
