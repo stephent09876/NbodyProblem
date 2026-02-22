@@ -5,6 +5,51 @@
 #include <random>
 #include <Eigen/Core>
 
+// --- Particle Class Definition ---
+class Particle {
+public:
+    Eigen::Vector2f position;
+    Eigen::Vector2f velocity;
+    float mass;
+    sf::CircleShape shape;
+
+    Particle(float m, sf::Color color, Eigen::Vector2f pos, Eigen::Vector2f vel) 
+        : mass(m), position(pos), velocity(vel) {
+        
+        // Visual representation setup
+        float radius = std::sqrt(mass) * 2.0f;
+        shape.setRadius(radius);
+        shape.setOrigin({radius, radius}); // Center the origin for Eigen mapping
+        shape.setFillColor(color);
+    }
+
+    void update(float deltaTime) {
+        // Linear motion: P_new = P_old + V * dt
+        position += velocity * deltaTime;
+
+        // Boundary bouncing logic (Window: 1300x800)
+        if (position.x() < 0 || position.x() > 1300) velocity.x() *= -1.0f;
+        if (position.y() < 0 || position.y() > 800)  velocity.y() *= -1.0f;
+
+        // Sync SFML shape with Eigen position
+        shape.setPosition({position.x(), position.y()});
+    }
+};
+
+// --- Helper Function for User Input ---
+int getParticleCount() {
+    int count;
+    std::cout << "Enter the number of particles (Max 100): ";
+    if (!(std::cin >> count)) return 0;
+    
+    // Limit to 100 particles as requested
+    if (count > 100) {
+        std::cout << "Limit exceeded. Setting count to 100." << std::endl;
+        return 100;
+    }
+    return std::max(0, count);
+}
+
 int main() {
 
     Eigen::Vector2f A;
@@ -24,48 +69,51 @@ int main() {
     std::cout << A << std::endl;
     std::cout << std::endl;
 
-    sf::RenderWindow window(sf::VideoMode({1300, 800}), "Particle Demo");
-    window.setPosition(sf::Vector2i(10, 10)); 
+
+    int numParticles = getParticleCount();
+
+    sf::RenderWindow window(sf::VideoMode({1300, 800}), "Eigen Multi-Particle Simulation");
     window.setFramerateLimit(60);
 
-    int numParticles;
-    std::cout << "Enter the number of particles: ";
-    if (!(std::cin >> numParticles)) return -1;
-
-    std::vector<Particle> particles(numParticles);
-
+    // Setup Randomness
     std::random_device rd;
     std::mt19937 gen(rd());
-    // Increased mass range to make size differences more obvious
-    std::uniform_real_distribution<float> massDist(5.0f, 100.0f);  
-    std::uniform_int_distribution<int> colorDist(0, 255);
+    std::uniform_real_distribution<float> massDist(5.0f, 100.0f);
+    std::uniform_real_distribution<float> posWidth(100.0f, 1200.0f);
+    std::uniform_real_distribution<float> posHeight(100.0f, 700.0f);
+    std::uniform_real_distribution<float> velDist(-150.0f, 150.0f);
+    std::uniform_int_distribution<int> colorDist(50, 255);
 
+    // Initialize Particle Vector
+    std::vector<Particle> particles;
     for (int i = 0; i < numParticles; ++i) {
-        float mass = massDist(gen);
-        sf::Color color;
-        color.r = colorDist(gen);
-        color.g = colorDist(gen);
-        color.b = colorDist(gen);
-        particles[i] = Particle(mass, color);
+        Eigen::Vector2f startPos(posWidth(gen), posHeight(gen));
+        Eigen::Vector2f startVel(velDist(gen), velDist(gen));
+        sf::Color color(colorDist(gen), colorDist(gen), colorDist(gen));
+        
+        particles.emplace_back(massDist(gen), color, startPos, startVel);
     }
 
     sf::Clock clock;
 
     while (window.isOpen()) {
-        float dt = clock.restart().asSeconds(); // Calculate time passed per frame
+        float dt = clock.restart().asSeconds();
 
-        while ( const std::optional event = window.pollEvent() )
-        {
-            if ( event->is<sf::Event::Closed>() )
+        while (const std::optional event = window.pollEvent()) {
+            if (event->is<sf::Event::Closed>())
                 window.close();
-            }
+        }
 
         window.clear(sf::Color::Black);
-        for (Particle& p : particles) {
+        
+        // Update and Draw all particles
+        for (auto& p : particles) {
             p.update(dt);
-            window.draw(p.shape); // FIX: Draw the .shape member
+            window.draw(p.shape);
         }
+        
         window.display();
     }
+
     return 0;
 }
