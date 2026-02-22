@@ -13,14 +13,17 @@
 
 class Particle {
 public:
-    Eigen::Vector2f position;
-    Eigen::Vector2f velocity;
+    Eigen::Vector2f position {0.0, 0.0};
+    Eigen::Vector2f velocity {0.0, 0.0};
+    Eigen::Vector2f accel {0.0, 0.0};
     float mass;
     sf::CircleShape shape;
+    
 
     // default constructor
     Particle(float m, sf::Color color, Eigen::Vector2f pos, Eigen::Vector2f vel);
 
     // update function
     void update(float deltaTime);
+    
 };

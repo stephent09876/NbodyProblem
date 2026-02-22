@@ -19,7 +19,9 @@ Particle::Particle(float m, sf::Color color, Eigen::Vector2f pos, Eigen::Vector2
 
 void Particle::update(float deltaTime) {
     // Linear motion: P_new = P_old + V * dt
+    velocity += accel * deltaTime;
     position += velocity * deltaTime;
+
 
     // Boundary bouncing logic (Window: 1300x800)
     if (position.x() < 0 || position.x() > 1300) velocity.x() *= -1.0f;

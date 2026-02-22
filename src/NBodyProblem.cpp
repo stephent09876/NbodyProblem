@@ -47,26 +47,36 @@ int main() {
     // Setup Randomness
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> massDist(5.0f, 100.0f);
+    //std::uniform_real_distribution<float> massDist(5.0f, 100.0f);
     std::uniform_real_distribution<float> posWidth(100.0f, 1200.0f);
     std::uniform_real_distribution<float> posHeight(100.0f, 700.0f);
     std::uniform_real_distribution<float> velDist(-150.0f, 150.0f);
-    std::uniform_int_distribution<int> colorDist(50, 255);
+    //std::uniform_int_distribution<int> colorDist(50, 255);
 
     // Initialize Particle Vector
     std::vector<Particle> particles;
     for (int i = 0; i < numParticles; ++i) {
         Eigen::Vector2f startPos(posWidth(gen), posHeight(gen));
         Eigen::Vector2f startVel(velDist(gen), velDist(gen));
-        sf::Color color(colorDist(gen), colorDist(gen), colorDist(gen));
-        
-        particles.emplace_back(massDist(gen), color, startPos, startVel);
+        //sf::Color color(colorDist(gen), colorDist(gen), colorDist(gen));
+        particles.emplace_back(40.0f, sf::Color::Red, startPos, startVel);
+        //particles.emplace_back(massDist(gen), color, startPos, startVel);
     }
 
     sf::Clock clock;
-
+    sf::Time totalTime = sf::Time::Zero; // Track total elapsed time
     while (window.isOpen()) {
-        float dt = clock.restart().asSeconds();
+        //float dt = clock.restart().asSeconds();
+        sf::Time dtTime = clock.restart();
+        float dt = dtTime.asSeconds();
+        totalTime += dtTime;
+
+        // Check for 5-minute timeout (300 seconds)
+        if (totalTime.asSeconds() >= 300.0f) {
+            std::cout << "5-minute timeout reached. Terminating program." << std::endl;
+            window.close();
+            break;
+        }
 
         while (const std::optional event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>())
