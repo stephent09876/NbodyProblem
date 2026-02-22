@@ -26,7 +26,7 @@ FetchContent_MakeAvailable(SFML Eigen)
 # add all source and include files
 set(SOURCES
     src/sfml_3_0_demo.cpp
-    src/Particle2.cpp)
+    src/Particle.cpp)
 
 add_executable(nBodyProject ${SOURCES})
 target_include_directories(nBodyProject PRIVATE include)

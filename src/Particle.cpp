@@ -4,7 +4,7 @@
  * Description: This file implements the particle class that is compilable with SFML 3.0
  **************************************************************************************************/
 
-#include "Particle2.hpp"
+#include "Particle.hpp"
 #include <cmath> // For sqrt if you want to scale radius by area
 
 Particle::Particle(float m, sf::Color color, Eigen::Vector2f pos, Eigen::Vector2f vel) 

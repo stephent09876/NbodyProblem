@@ -1,4 +1,4 @@
-#include "Particle2.hpp"
+#include "Particle.hpp"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
