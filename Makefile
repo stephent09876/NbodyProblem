@@ -3,8 +3,6 @@
 # sfml 2.6 code will be phased out eventually.
 # this make file was written with chatGPT assistance
 ######################################################################
-# Compiler
-
 # Clean build files
 spotless:
 	rm -rf nBodyProject

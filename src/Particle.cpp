@@ -11,7 +11,7 @@ Particle::Particle(float m, sf::Color color, Eigen::Vector2f pos, Eigen::Vector2
         : mass(m), position(pos), velocity(vel) {
         
         // Visual representation setup
-        float radius = std::sqrt(mass) * 2.0f;
+        radius = std::sqrt(mass) * 2.0f;
         shape.setRadius(radius);
         shape.setOrigin({radius, radius}); // Center the origin for Eigen mapping
         shape.setFillColor(color);

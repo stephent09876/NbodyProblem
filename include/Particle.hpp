@@ -16,7 +16,8 @@ public:
     Eigen::Vector2f position {0.0, 0.0};
     Eigen::Vector2f velocity {0.0, 0.0};
     Eigen::Vector2f accel {0.0, 0.0};
-    float mass;
+    float mass = 0.0;
+    float radius = 0.0;
     sf::CircleShape shape;
     
 
