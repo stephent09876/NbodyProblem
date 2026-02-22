@@ -7,32 +7,24 @@
 #include "Particle2.hpp"
 #include <cmath> // For sqrt if you want to scale radius by area
 
-Particle::Particle(float mass, sf::Color color) : mass(mass), color(color) {
-    // Set radius based on mass. 
-    // Using sqrt(mass) often looks more natural as it represents volume/area
-    float radius = std::sqrt(mass) * 2.0f; 
-    shape.setRadius(radius);
-    shape.setOrigin(sf::Vector2f(radius, radius)); // Center the origin for better physics
-    shape.setFillColor(color);
-
-    // Initial random positions within the 1300x800 window
-    x = (float)rand() / RAND_MAX * 1300;
-    y = (float)rand() / RAND_MAX * 800;
-    
-    // Increased initial velocity so movement is visible
-    velocityX = ((float)rand() / RAND_MAX - 0.5f) * 100.f;
-    velocityY = ((float)rand() / RAND_MAX - 0.5f) * 100.f;
-}
+Particle::Particle(float m, sf::Color color, Eigen::Vector2f pos, Eigen::Vector2f vel) 
+        : mass(m), position(pos), velocity(vel) {
+        
+        // Visual representation setup
+        float radius = std::sqrt(mass) * 2.0f;
+        shape.setRadius(radius);
+        shape.setOrigin({radius, radius}); // Center the origin for Eigen mapping
+        shape.setFillColor(color);
+    }
 
 void Particle::update(float deltaTime) {
+    // Linear motion: P_new = P_old + V * dt
+    position += velocity * deltaTime;
 
-    // TODO: calculate velocity from acceleration as well
-    x += velocityX * deltaTime;
-    y += velocityY * deltaTime;
+    // Boundary bouncing logic (Window: 1300x800)
+    if (position.x() < 0 || position.x() > 1300) velocity.x() *= -1.0f;
+    if (position.y() < 0 || position.y() > 800)  velocity.y() *= -1.0f;
 
-    // Boundary bouncing updated for 1300x800 window
-    if (x < 0 || x > 1300) velocityX *= -1.f;
-    if (y < 0 || y > 800) velocityY *= -1.f;
-
-    shape.setPosition(sf::Vector2f(x, y));
+    // Sync SFML shape with Eigen position
+    shape.setPosition({position.x(), position.y()});
 }
