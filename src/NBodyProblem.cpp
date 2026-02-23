@@ -149,6 +149,7 @@ int main() {
                     case SimulationMode::Paused:
                         sim_mode = SimulationMode::Running;
                         buttonText.setString("Pause");
+                        break;
                 }
             }
         }
