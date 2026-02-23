@@ -1,3 +1,19 @@
+/**************************************************************************************************
+ * File: NBodyProblem.cpp
+ * Date: 2/22/2025
+ * Authors:
+ *          Stephen Thorsell
+ *          Xiaohua Liu
+ *          Shahzaib Memon
+ * 
+ * Description: This is the main execution script of the N Body Problem project being developed for
+ *              Sprint 2026 SWEN 5239 Group XX. The following code sets up a simulation where a
+ *              system of particles gravitationally interact with each other via newtons gravity
+ *              equation. A graphics library is used to render the particles on the screen and a 
+ *              user specified choice of numerical integrator (choices of Euler, Leapfrog, or RK4)
+ *              is used to propagate the sim. 
+ **************************************************************************************************/
+
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <cmath>
@@ -5,7 +21,9 @@
 #include <random>
 #include <Eigen/Core>
 
+// Internal project includes
 #include "Particle.hpp"
+#include "SimulationMode.hpp"
 
 // ---------------- Individual function declarations ---------------------------
 
@@ -28,18 +46,14 @@ float G = 100;
 Eigen::Vector<unsigned int, 2> window_size {1300, 800};
 
 
-
-// ------------------------------------------------------------------------------
-
-
-
+// -------------------- MAIN FUNCTION -------------------------------------------
 int main() {
 
     // ------------------- SIMULATION INITIALIZATION ----------------------------
 
     int numParticles = getParticleCount();
 
-    sf::RenderWindow window(sf::VideoMode({window_size[0], window_size[1]}), "Eigen Multi-Particle Simulation");
+    sf::RenderWindow window(sf::VideoMode({window_size[0], window_size[1]}), "N-Body Gravity Simulation");
     window.setFramerateLimit(60);
 
     // Setup Randomness
@@ -65,15 +79,35 @@ int main() {
                                
     }
 
+    // set up a clock to track elapsed simulation time
     sf::Clock clock;
-    sf::Time totalTime = sf::Time::Zero; // Track total elapsed time
+    sf::Time totalTime = sf::Time::Zero; 
+
+    // set up a button to track whether the simulation is paused.
+    SimulationMode sim_mode = SimulationMode::Running;
+    bool mouse_button_pressed = false;
+
+    sf::RectangleShape button(sf::Vector2f(120.f, 40.f));
+    button.setPosition(sf::Vector2f(20.f, 20.f));
+    button.setFillColor(sf::Color::Blue);
+
+    sf::Font font("bin/arial.ttf");
+    sf::Text buttonText(font);
+    buttonText.setString("Pause");
+    buttonText.setCharacterSize(18);
+    buttonText.setPosition(sf::Vector2f(35.f, 25.f));
+    buttonText.setFillColor(sf::Color::White);
+
 
     // -------------------- END SIM INITIALIZATION --------------------------------
 
     // -------------------- MAIN SIMULATION LOOP ----------------------------------
 
     while (window.isOpen()) {
-        //float dt = clock.restart().asSeconds();
+        // reset button press mechanic
+        mouse_button_pressed = false;
+
+        // log time
         sf::Time dtTime = clock.restart();
         float dt = dtTime.asSeconds();
         totalTime += dtTime;
@@ -85,20 +119,59 @@ int main() {
             break;
         }
 
+        // poll for new events
         while (const std::optional event = window.pollEvent()) {
+            
+            // poll for window closed event
             if (event->is<sf::Event::Closed>())
                 window.close();
+
+            // poll for button press event
+            if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
+                if (mouseButtonPressed ->button == sf::Mouse::Button::Left) {
+                    mouse_button_pressed = true;
+                }
+            }
         }
 
+        // switch simulation state if needed
+        if (mouse_button_pressed) {
+            sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
+            if (button.getGlobalBounds().contains(mousePos)) {
+
+                // toggle simulation state
+                switch (sim_mode) {
+                    case SimulationMode::Running:
+                        sim_mode = SimulationMode::Paused;
+                        buttonText.setString("Resume");
+                        break;
+                    case SimulationMode::Paused:
+                        sim_mode = SimulationMode::Running;
+                        buttonText.setString("Pause");
+                }
+            }
+        }
+
+        // Update Particle State
+        if (sim_mode == SimulationMode::Running) {
+            gravityModel(particles);
+
+            for (Particle& p : particles) {
+                p.update(dt);
+            }
+        }
+
+        // Reset window
         window.clear(sf::Color::Black);
 
-        gravityModel(particles);
-        
-        // Update and Draw all particles
-        for (auto& p : particles) {
-            p.update(dt);
+        // Draw particles
+        for (Particle& p : particles) {
             window.draw(p.shape);
         }
+        
+        // draw pause/play button
+        window.draw(buttonText);
         
         window.display();
     }
