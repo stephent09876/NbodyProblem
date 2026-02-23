@@ -7,8 +7,12 @@
 #include "Particle.hpp"
 #include <cmath> // For sqrt if you want to scale radius by area
 
-Particle::Particle(float m, sf::Color color, Eigen::Vector2f pos, Eigen::Vector2f vel) 
-        : mass(m), position(pos), velocity(vel) {
+Particle::Particle(float m, 
+                   sf::Color color, 
+                   Eigen::Vector2f pos, 
+                   Eigen::Vector2f vel, 
+                   Eigen::Vector2f bounds) 
+        : mass(m), position(pos), velocity(vel), boundary{bounds} {
         
         // Visual representation setup
         radius = std::sqrt(mass) * 2.0f;
