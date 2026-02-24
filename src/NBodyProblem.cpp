@@ -189,42 +189,91 @@ int getParticleCount() {
     if (!(std::cin >> count)) return 0;
     
     // Limit to 100 particles as requested
-    if (count > 100) {
+    if (count < 0 || count > 100) {
         std::cout << "Limit exceeded. Setting count to 100." << std::endl;
         return 100;
     }
     return std::max(0, count);
 }
 
+// Original code before adding collision effect - Xiao Hua Liu 02/24/2026
+//void gravityModel(std::vector<Particle> &p) {
+//    for (std::size_t idx = 0; idx < p.size(); idx++) {
 
+        // reset acceleration vector
+//        Eigen::Vector2f accel{0.0, 0.0};
+
+//        for (std::size_t jdx = 0; jdx < p.size(); jdx++) {
+
+//            // skip if the ith particle and jth particle are the same
+//            if (idx == jdx) {
+//                continue;
+//            }
+
+//            Eigen::Vector2f r_ji;
+//            float           r_mag;
+
+            // calculate position vector from the jth particle to the ith particle
+//            r_ji = p[idx].position - p[jdx].position;
+//            r_mag = r_ji.norm();
+
+//            if (r_mag < 2.0 * p[idx].radius) {
+//                continue;  // dont calculate an acceleration between these particles if they're too close
+//            }
+
+            // Calculate gravitational acceleration (minus sign is on purpose via chosen convention)
+//            accel -= 1.0 * G * p[jdx].mass / std::pow(r_mag, 3) * r_ji; 
+//        }
+
+//        p[idx].accel = accel;
+//    }
+//}
+//Added Collision effect Xiao Hua Liu 02/24/2026
 void gravityModel(std::vector<Particle> &p) {
     for (std::size_t idx = 0; idx < p.size(); idx++) {
 
         // reset acceleration vector
-        Eigen::Vector2f accel{0.0, 0.0};
+        Eigen::Vector2f total_accel{0.0, 0.0};
 
         for (std::size_t jdx = 0; jdx < p.size(); jdx++) {
 
-            // skip if the ith particle and jth particle are the same
-            if (idx == jdx) {
-                continue;
+            if (idx == jdx) continue;
+
+            // Calculate relative position and distance
+            Eigen::Vector2f r_ji = p[idx].position - p[jdx].position;
+            float r_mag = r_ji.norm();
+
+            // --- 1. Collision Handling (Elastic Impact) ---
+            float min_dist = 2.0 * p[jdx].radius;
+            
+            if (r_mag < min_dist) {
+                // To prevent sticking, we only resolve if they are moving toward each other
+                Eigen::Vector2f relative_vel = p[idx].velocity - p[jdx].velocity;
+                float velocity_along_normal = relative_vel.dot(r_ji.normalized());
+
+                if (velocity_along_normal < 0) {
+                    // Simple perfectly elastic collision formula for velocity change
+                    // This uses a simplified impulse based on equal masses (since mass=10 for all)
+                    // If you want varying masses: impulse = (2 * v_rel) / (m1 + m2)
+                    float restitution = 0.9f; // 1.0 = bouncy, 0.5 = sluggish
+                    float impulse_mag = -(1.0f + restitution) * velocity_along_normal;
+                    impulse_mag /= (1.0f / p[idx].mass + 1.0f / p[jdx].mass);
+
+                    Eigen::Vector2f impulse = impulse_mag * r_ji.normalized();
+                    
+                    // Apply velocity change immediately to prevent overlapping "stickiness"
+                    p[idx].velocity += (1.0f / p[idx].mass) * impulse;
+                }
+                
+                // Skip gravity if they are colliding to avoid singularities
+                continue; 
             }
 
-            Eigen::Vector2f r_ji;
-            float           r_mag;
-
-            // calculate position vector from the jth particle to the ith particle
-            r_ji = p[idx].position - p[jdx].position;
-            r_mag = r_ji.norm();
-
-            if (r_mag < 2.0 * p[idx].radius) {
-                continue;  // dont calculate an acceleration between these particles if they're too close
-            }
-
-            // Calculate gravitational acceleration (minus sign is on purpose via chosen convention)
-            accel -= 1.0 * G * p[jdx].mass / std::pow(r_mag, 3) * r_ji; 
+            // --- 2. Standard Gravity Model ---
+            // Calculate gravitational acceleration
+            total_accel -= 1.0 * G * p[jdx].mass / std::pow(r_mag, 3) * r_ji; 
         }
 
-        p[idx].accel = accel;
+        p[idx].accel = total_accel;
     }
 }
