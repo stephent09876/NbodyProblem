@@ -21,3 +21,11 @@ Stephen_Thorsell_CMake_fetching_multiple_repositories.pdf:
 This AI prompt was to help me install the Eigen linear algebra library. The SFML template project
 repository that I pulled had the SFML installation built into the CMakeLists.txt file already but
 I had no idea how to add an extra repository to install in this manner.
+
+
+FEATURE 2 AI USAGE:
+
+Help_with_pause_resume_user_story.pdf: 
+This AI prompt helped design the pause play button functionality. Some of the 
+code is meant for old SFML 2.6.1 version and was modified for the current version
+of the graphics library.
