@@ -24,6 +24,7 @@
 // Internal project includes
 #include "Particle.hpp"
 #include "SimulationMode.hpp"
+#include "SimulationValidation.hpp"
 
 // ---------------- Individual function declarations ---------------------------
 
@@ -41,6 +42,7 @@ void gravityModel(std::vector<Particle> &p);
 
 // universal gravity constant. Tune to modify simulation response [unitless]
 float G = 100;
+double energy_drift_threshold_percent = 5.0;
 
 // size of window that SFML will generate
 Eigen::Vector<unsigned int, 2> window_size {1300, 800};
@@ -97,6 +99,18 @@ int main() {
     buttonText.setCharacterSize(18);
     buttonText.setPosition(sf::Vector2f(35.f, 25.f));
     buttonText.setFillColor(sf::Color::White);
+
+    sf::Text validationText(font);
+    validationText.setCharacterSize(15);
+    validationText.setPosition(sf::Vector2f(20.f, 80.f));
+    validationText.setFillColor(sf::Color::White);
+
+    sf::Text validationWarningText(font);
+    validationWarningText.setCharacterSize(15);
+    validationWarningText.setPosition(sf::Vector2f(20.f, 105.f));
+    validationWarningText.setFillColor(sf::Color::Red);
+
+    const ValidationState initialValidationState = computeValidationState(particles, G);
 
 
     // -------------------- END SIM INITIALIZATION --------------------------------
@@ -163,6 +177,13 @@ int main() {
             }
         }
 
+        const ValidationState currentValidationState = computeValidationState(particles, G);
+        const ValidationResult validation = evaluateValidation(initialValidationState,
+                                                              currentValidationState,
+                                                              energy_drift_threshold_percent);
+        validationText.setString(validation.metrics_line);
+        validationWarningText.setString(validation.warning_line);
+
         // Reset window
         window.clear(sf::Color::Black);
 
@@ -172,7 +193,10 @@ int main() {
         }
         
         // draw pause/play button
+        window.draw(button);
         window.draw(buttonText);
+        window.draw(validationText);
+        window.draw(validationWarningText);
         
         window.display();
     }
