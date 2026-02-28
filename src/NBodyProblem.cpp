@@ -24,18 +24,13 @@
 // Internal project includes
 #include "Particle.hpp"
 #include "SimulationMode.hpp"
+#include "Gravity.hpp"
 
 // ---------------- Individual function declarations ---------------------------
 
 /// @brief  getParticleCount - prompt a user input where the user specifies the total number of
 /// particles to be ran in the simulation
 int getParticleCount();
-
-/// @brief gravityModel - The Newtownian gravity model. Runs through a list of particles and
-/// calculates the gravitational acceleration for each individual particle.
-/// @param p vector of particles
-void gravityModel(std::vector<Particle> &p);
-
 
 // ------------------- Simulation Variables -------------------------------------
 
@@ -52,6 +47,8 @@ int main() {
     // ------------------- SIMULATION INITIALIZATION ----------------------------
 
     int numParticles = getParticleCount();
+
+ 
 
     sf::RenderWindow window(sf::VideoMode({window_size[0], window_size[1]}), "N-Body Gravity Simulation");
     window.setFramerateLimit(60);
@@ -78,6 +75,9 @@ int main() {
                                window_size.cast<float>());
                                
     }
+
+    // initialize gravity model TEMPORARY: EVENTUALLY THIS WILL BE THE INTEGRATOR CLASS
+    GravityModel gravity(particles, G);
 
     // set up a clock to track elapsed simulation time
     sf::Clock clock;
@@ -156,7 +156,7 @@ int main() {
 
         // Update Particle State
         if (sim_mode == SimulationMode::Running) {
-            gravityModel(particles);
+            gravity.update();
 
             for (Particle& p : particles) {
                 p.update(dt);
@@ -194,37 +194,4 @@ int getParticleCount() {
         return 100;
     }
     return std::max(0, count);
-}
-
-
-void gravityModel(std::vector<Particle> &p) {
-    for (std::size_t idx = 0; idx < p.size(); idx++) {
-
-        // reset acceleration vector
-        Eigen::Vector2f accel{0.0, 0.0};
-
-        for (std::size_t jdx = 0; jdx < p.size(); jdx++) {
-
-            // skip if the ith particle and jth particle are the same
-            if (idx == jdx) {
-                continue;
-            }
-
-            Eigen::Vector2f r_ji;
-            float           r_mag;
-
-            // calculate position vector from the jth particle to the ith particle
-            r_ji = p[idx].position - p[jdx].position;
-            r_mag = r_ji.norm();
-
-            if (r_mag < 2.0 * p[idx].radius) {
-                continue;  // dont calculate an acceleration between these particles if they're too close
-            }
-
-            // Calculate gravitational acceleration (minus sign is on purpose via chosen convention)
-            accel -= 1.0 * G * p[jdx].mass / std::pow(r_mag, 3) * r_ji; 
-        }
-
-        p[idx].accel = accel;
-    }
 }

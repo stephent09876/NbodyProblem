@@ -26,7 +26,8 @@ FetchContent_MakeAvailable(SFML Eigen)
 # add all source and include files
 set(SOURCES
     src/NBodyProblem.cpp
-    src/Particle.cpp)
+    src/Particle.cpp
+    src/Gravity.cpp)
 
 add_executable(nBodyProject ${SOURCES})
 target_include_directories(nBodyProject PRIVATE include)

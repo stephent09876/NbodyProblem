@@ -1,6 +1,6 @@
 /**************************************************************************************************
- * File: Particle2.cpp
- * Date: 2/15/2025
+ * File: Particle.cpp
+ * Date: 2/15/2026
  * Description: This file implements the particle class that is compilable with SFML 3.0
  **************************************************************************************************/
 
