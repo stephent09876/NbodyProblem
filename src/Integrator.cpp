@@ -2,11 +2,16 @@
  * File: Integrator.cpp
  * Date: 2/28/2025
  * Description: This file implements the numerical integrators for propagating the N-body simulator
- *              forward in time. The user has the choice of three diferent integrators (Euler Step,
+ *              forward in time. The user has the choice of three different integrators (Euler Step,
  *              Leapfrog, and RK4). The default choice will be Leapfrog as many sources has deemed
  *              this integrator well suited for orbital mechanices because of the ability to 
  *              conserve the initial simulation's energy state very well. This class also 
  *              instantiates the gravity model.
+ *              
+ *              Integrators ranked by difficulty to understand whats going on:
+ *              Euler step - EASY
+ *              Leapfrog   - MEDIUM
+ *              RK4        - HARD
  *              
  *              Sources for each type of integrator is below. 
  * SOURCES:
@@ -68,7 +73,7 @@ void Integrator::LeapFrog(float dt) {
     }
 
     // save off previous accelerations
-    for (std::size_t idx = 0; idx < gravity.p.size(); idx++) {
+    for (std::size_t idx = 0; idx < NUM_PARTICLES; idx++) {
         prev_accel.row(idx) = gravity.p[idx].accel;
     }
 
@@ -76,7 +81,7 @@ void Integrator::LeapFrog(float dt) {
     gravity.update();
 
     // compute velocity
-    for (std::size_t idx = 0; idx < gravity.p.size(); idx++) {
+    for (std::size_t idx = 0; idx < NUM_PARTICLES; idx++) {
         gravity.p[idx].velocity += 0.5*(prev_accel.row(idx).transpose() + gravity.p[idx].accel)*dt;
     }
 
@@ -86,7 +91,7 @@ void Integrator::LeapFrog(float dt) {
 void Integrator::RK4(float dt) {
 
     /********************************************************************************
-     * STATE VECTOR
+     * STATE VECTOR EXPLANATION
      * Each particle has a position: [x, y], velocity: [vx, vy] and acceleration: [ax, ay]
      * The total size of the state vector then becomes 4N where the state vector, X, gets constructed 
      * as follows:
@@ -103,13 +108,13 @@ void Integrator::RK4(float dt) {
 
     /// TODO: this will probably break anytime num_particles < 2
 
-    int state_vector_size = gravity.p.size()*4;
+    int state_vector_size = 4*NUM_PARTICLES;
 
     // RK4 state vector at the current time step.
     Eigen::VectorXf Xk(state_vector_size);
 
     // RK4 state vector at the future time step
-    Eigen::VectorXf xkplus1(state_vector_size);
+    Eigen::VectorXf Xkplus1(state_vector_size);
 
     // initialize K variables
     Eigen::VectorXf K1(state_vector_size);
@@ -117,21 +122,79 @@ void Integrator::RK4(float dt) {
     Eigen::VectorXf K3(state_vector_size);
     Eigen::VectorXf K4(state_vector_size);
 
+    // intermediate variable to help support the K variable computations
+    Eigen::VectorXf X_modded(state_vector_size);
+
     int midpoint = state_vector_size/2;
 
-    std::cout << midpoint << std::endl;
+    // Create the state vector at the current time step
+    for (std::size_t idx = 0; idx < NUM_PARTICLES; idx++) {
+        Xk.block<2, 1>(2*idx, 0)          = gravity.p[idx].position;
+        Xk.block<2, 1>(midpoint+2*idx, 0) = gravity.p[idx].velocity;
+    }
 
-    /// TODO: save off the current particle's state
-
-    
-    // compute K1
+    /************************ K1 computation ***********************/
     gravity.update();
 
-    for (std::size_t idx = 0; idx < gravity.p.size(); idx++) {
-        K1[2*idx]   = gravity.p[idx].velocity[0];
-        K1[2*idx+1] = gravity.p[idx].velocity[1];
+    for (std::size_t idx = 0; idx < NUM_PARTICLES; idx++) {
+        K1.block<2, 1>(2*idx, 0)            = gravity.p[idx].velocity;
+        K1.block<2, 1>(midpoint + 2*idx, 0) = gravity.p[idx].accel;
 
-        K1[midpoint + 2*idx]   = gravity.p[idx].accel[0];
-        K1[midpoint + 2*idx+1] = gravity.p[idx].accel[1];
+    }
+
+    /************************ K2 computation ***********************/
+    X_modded = Xk + 0.5*K1*dt;
+
+    for (std::size_t idx = 0; idx < NUM_PARTICLES; idx++) {
+        gravity.p[idx].position = X_modded.block<2, 1>(2*idx, 0);
+        gravity.p[idx].velocity = X_modded.block<2, 1>(midpoint + 2*idx, 0);
+    }
+
+    gravity.update();
+
+    for (std::size_t idx = 0; idx < NUM_PARTICLES; idx++) {
+        K2.block<2, 1>(2*idx, 0)            = gravity.p[idx].velocity;
+        K2.block<2, 1>(midpoint + 2*idx, 0) = gravity.p[idx].accel;
+
+    }
+    
+    /************************ K3 computation ***********************/
+    X_modded = Xk + 0.5*K2*dt;
+
+    for (std::size_t idx = 0; idx < NUM_PARTICLES; idx++) {
+        gravity.p[idx].position = X_modded.block<2, 1>(2*idx, 0);
+        gravity.p[idx].velocity = X_modded.block<2, 1>(midpoint + 2*idx, 0);
+    }
+
+    gravity.update();
+
+    for (std::size_t idx = 0; idx < NUM_PARTICLES; idx++) {
+        K3.block<2, 1>(2*idx, 0)            = gravity.p[idx].velocity;
+        K3.block<2, 1>(midpoint + 2*idx, 0) = gravity.p[idx].accel;
+
+    }
+
+    /************************ K4 computation ***********************/
+    X_modded = Xk + K3*dt;
+
+    for (std::size_t idx = 0; idx < NUM_PARTICLES; idx++) {
+        gravity.p[idx].position = X_modded.block<2, 1>(2*idx, 0);
+        gravity.p[idx].velocity = X_modded.block<2, 1>(midpoint + 2*idx, 0);
+    }
+
+    gravity.update();
+
+    for (std::size_t idx = 0; idx < NUM_PARTICLES; idx++) {
+        K3.block<2, 1>(2*idx, 0)            = gravity.p[idx].velocity;
+        K3.block<2, 1>(midpoint + 2*idx, 0) = gravity.p[idx].accel;
+
+    }
+
+    /**************** Runge-Kutta State Update *****************/
+    Xkplus1 = Xk + dt/6.0 * (K1 + 2.0*K2 + 2.0*K3 + K4);
+
+    for (std::size_t idx = 0; idx < NUM_PARTICLES; idx++) {
+        gravity.p[idx].position = Xkplus1.block<2, 1>(2*idx, 0);
+        gravity.p[idx].velocity = Xkplus1.block<2, 1>(midpoint + 2*idx, 0);
     }
 }

@@ -38,7 +38,7 @@ int getParticleCount();
 float G = 100;
 
 // numerical integrator that is used to propagate the particle states (change at will here)
-IntegrationMode integ_mode_slct = IntegrationMode::RK4;
+IntegrationMode integ_mode_slct = IntegrationMode::LeapFrog;
 
 // size of window that SFML will generate
 Eigen::Vector<unsigned int, 2> window_size {1300, 800};
@@ -55,13 +55,14 @@ int main() {
 
     sf::RenderWindow window(sf::VideoMode({window_size[0], window_size[1]}), "N-Body Gravity Simulation");
     window.setFramerateLimit(60);
+    window.setPosition(sf::Vector2i{100, 100});
 
     // Setup Randomness
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> posWidth(100.0f, 1200.0f);
     std::uniform_real_distribution<float> posHeight(100.0f, 700.0f);
-    std::uniform_real_distribution<float> velDist(-0.0f, 0.0f);
+    std::uniform_real_distribution<float> velDist(-0.01f, 0.01f);
 
     // Initialize Particle Vector
     std::vector<Particle> particles;
@@ -157,7 +158,7 @@ int main() {
             }
         }
 
-        // Update Particle State
+        // Update Particle State with gravity
         if (sim_mode == SimulationMode::Running) {
             integrator.update(dt);
 

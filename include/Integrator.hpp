@@ -36,7 +36,8 @@ public:
                std::vector<Particle> &p_in, 
                float G);
 
-    // top level update function
+    ///@brief top level update function
+    ///@param dt - simulation timestep
     void update(float dt);
 
 
@@ -54,7 +55,8 @@ private:
     // supporting variable for the leapfrog acceleration
     Eigen::Matrix<float, 100, 2> prev_accel;
 
-    // individual integration subroutines for the different types of integrators
+    ///@brief individual integration subroutines for the different types of integrators
+    /// @param dt - simulation timestep
     void EulerStep(float dt);
     void LeapFrog(float dt);
     void RK4(float dt);
