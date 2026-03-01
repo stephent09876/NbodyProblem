@@ -185,8 +185,8 @@ void Integrator::RK4(float dt) {
     gravity.update();
 
     for (std::size_t idx = 0; idx < NUM_PARTICLES; idx++) {
-        K3.block<2, 1>(2*idx, 0)            = gravity.p[idx].velocity;
-        K3.block<2, 1>(midpoint + 2*idx, 0) = gravity.p[idx].accel;
+        K4.block<2, 1>(2*idx, 0)            = gravity.p[idx].velocity;
+        K4.block<2, 1>(midpoint + 2*idx, 0) = gravity.p[idx].accel;
 
     }
 
