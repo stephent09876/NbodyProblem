@@ -24,7 +24,7 @@
 // Internal project includes
 #include "Particle.hpp"
 #include "SimulationMode.hpp"
-#include "Gravity.hpp"
+#include "Integrator.hpp"
 
 // ---------------- Individual function declarations ---------------------------
 
@@ -32,10 +32,13 @@
 /// particles to be ran in the simulation
 int getParticleCount();
 
-// ------------------- Simulation Variables -------------------------------------
+// ------------------- Set Simulation Variables -------------------------------------
 
 // universal gravity constant. Tune to modify simulation response [unitless]
 float G = 100;
+
+// numerical integrator that is used to propagate the particle states (change at will here)
+IntegrationMode integ_mode_slct = IntegrationMode::Leapfrog;
 
 // size of window that SFML will generate
 Eigen::Vector<unsigned int, 2> window_size {1300, 800};
@@ -77,7 +80,7 @@ int main() {
     }
 
     // initialize gravity model TEMPORARY: EVENTUALLY THIS WILL BE THE INTEGRATOR CLASS
-    GravityModel gravity(particles, G);
+    Integrator integrator(integ_mode_slct, particles, G);
 
     // set up a clock to track elapsed simulation time
     sf::Clock clock;
@@ -156,10 +159,10 @@ int main() {
 
         // Update Particle State
         if (sim_mode == SimulationMode::Running) {
-            gravity.update();
+            integrator.update(dt);
 
             for (Particle& p : particles) {
-                p.update(dt);
+                p.update();
             }
         }
 

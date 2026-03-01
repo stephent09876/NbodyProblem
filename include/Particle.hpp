@@ -1,5 +1,5 @@
 /**************************************************************************************************
- * File: Particle2.hpp
+ * File: Particle.hpp
  * Date: 2/15/2025
  * Description: This file implements the particle class that is compilable with SFML 3.0
  **************************************************************************************************/
@@ -36,6 +36,6 @@ public:
              Eigen::Vector2f bounds);
 
     // update function
-    void update(float deltaTime);
+    void update();
     
 };

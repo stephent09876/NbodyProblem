@@ -27,6 +27,7 @@ FetchContent_MakeAvailable(SFML Eigen)
 set(SOURCES
     src/NBodyProblem.cpp
     src/Particle.cpp
+    src/Integrator.cpp
     src/Gravity.cpp)
 
 add_executable(nBodyProject ${SOURCES})

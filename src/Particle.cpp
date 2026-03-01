@@ -21,11 +21,7 @@ Particle::Particle(float m,
         shape.setFillColor(color);
     }
 
-void Particle::update(float deltaTime) {
-    // Linear motion: P_new = P_old + V * dt
-    velocity += accel * deltaTime;
-    position += velocity * deltaTime;
-
+void Particle::update() {
 
     // Boundary bouncing logic (Window: 1300x800)
     if (position.x() < 0 || position.x() > 1300) velocity.x() *= -1.0f;

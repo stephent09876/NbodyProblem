@@ -15,17 +15,21 @@ class GravityModel {
 
 public:
 
-    /// @brief gravityModel - The Newtownian gravity model. Runs through a list of particles and
-    /// calculates the gravitational acceleration for each individual particle.
+    /// @brief GravityModel - default Constructor
+    /// @param Particles_in - A vector of particle instances that the gravity model will generate
+    ///                       accelerations for.
+    /// @param G_in - The Universal Gravitational constant for the sim
     GravityModel(std::vector<Particle> &particles_in, float G_in);
     
-    // main gravity model update function
+    /// @brief main gravity model update function - The Newtownian gravity model. Runs through a 
+    /// list of particles and calculates the gravitational acceleration for each individual 
+    /// particle.
     void update();
 
-private:
-    
     /// @brief Vector of particles
     std::vector<Particle> &p;
+
+private:
 
     /// @brief Universal gravitation constant
     float G = 0.0;

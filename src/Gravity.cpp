@@ -1,8 +1,9 @@
 /**************************************************************************************************
  * File: Gravity.Cpp
  * Date: 2/28/2026
- * Description: This file implements a newtonian gravity model. Having its own impimentation makes it
+ * Description: This file implements a newtonian gravity model. Having its own implimentation makes it
  * much more amenable to having multiple different numerical integrators
+ * SOURCES: https://en.wikipedia.org/wiki/N-body_simulation
  **************************************************************************************************/
 
 #include "Gravity.hpp"
@@ -12,7 +13,9 @@ GravityModel::GravityModel(std::vector<Particle> &particles_in,
                            p(particles_in),
                            G(G_in) {}
 
-                           
+
+// update gravity model: run through list of particles and calculate all gravity accelerations
+// that all the particles impose on each other                           
 void GravityModel::update()
 {
      for (std::size_t idx = 0; idx < p.size(); idx++) {
