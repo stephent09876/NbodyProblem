@@ -7,7 +7,7 @@
  *          Shahzaib Memon
  * 
  * Description: This is the main execution script of the N Body Problem project being developed for
- *              Sprint 2026 SWEN 5239 Group XX. The following code sets up a simulation where a
+ *              Sprint 2026 SWEN 5239 Group 7. The following code sets up a simulation where a
  *              system of particles gravitationally interact with each other via newtons gravity
  *              equation. A graphics library is used to render the particles on the screen and a 
  *              user specified choice of numerical integrator (choices of Euler, Leapfrog, or RK4)
@@ -25,6 +25,7 @@
 #include "Particle.hpp"
 #include "SimulationMode.hpp"
 #include "Integrator.hpp"
+#include "SimulationValidation.hpp"
 
 // ---------------- Individual function declarations ---------------------------
 
@@ -32,10 +33,20 @@
 /// particles to be ran in the simulation
 int getParticleCount();
 
+void handleCollisions(std::vector<Particle> &p);
+
+
+
 // ------------------- Set Simulation Variables -------------------------------------
 
 // universal gravity constant. Tune to modify simulation response [unitless]
 float G = 100;
+
+// If total particle energy drift by this amount, a warning message will display
+double energy_drift_threshold_percent = 5.0;
+
+// Enable switch for collision physics
+bool collision_enabled = true;
 
 // numerical integrator that is used to propagate the particle states (change at will here)
 IntegrationMode integ_mode_slct = IntegrationMode::LeapFrog;
@@ -102,6 +113,18 @@ int main() {
     buttonText.setPosition(sf::Vector2f(35.f, 25.f));
     buttonText.setFillColor(sf::Color::White);
 
+    sf::Text validationText(font);
+    validationText.setCharacterSize(15);
+    validationText.setPosition(sf::Vector2f(20.f, 80.f));
+    validationText.setFillColor(sf::Color::White);
+
+    sf::Text validationWarningText(font);
+    validationWarningText.setCharacterSize(15);
+    validationWarningText.setPosition(sf::Vector2f(20.f, 105.f));
+    validationWarningText.setFillColor(sf::Color::Red);
+
+    const ValidationState initialValidationState = computeValidationState(particles, G);
+
 
     // -------------------- END SIM INITIALIZATION --------------------------------
 
@@ -132,7 +155,7 @@ int main() {
 
             // poll for button press event
             if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
-                if (mouseButtonPressed ->button == sf::Mouse::Button::Left) {
+                if (mouseButtonPressed->button == sf::Mouse::Button::Left) {
                     mouse_button_pressed = true;
                 }
             }
@@ -161,11 +184,23 @@ int main() {
         // Update Particle State with gravity
         if (sim_mode == SimulationMode::Running) {
             integrator.update(dt);
+            
+            //  calculate collision
+            if (collision_enabled) {
+                handleCollisions(particles);
+            }
 
             for (Particle& p : particles) {
                 p.update();
             }
         }
+
+        const ValidationState currentValidationState = computeValidationState(particles, G);
+        const ValidationResult validation = evaluateValidation(initialValidationState,
+                                                              currentValidationState,
+                                                              energy_drift_threshold_percent);
+        validationText.setString(validation.metrics_line);
+        validationWarningText.setString(validation.warning_line);
 
         // Reset window
         window.clear(sf::Color::Black);
@@ -176,7 +211,10 @@ int main() {
         }
         
         // draw pause/play button
+        window.draw(button);
         window.draw(buttonText);
+        window.draw(validationText);
+        window.draw(validationWarningText);
         
         window.display();
     }
@@ -193,9 +231,50 @@ int getParticleCount() {
     if (!(std::cin >> count)) return 0;
     
     // Limit to 100 particles as requested
-    if (count > 100) {
+    if (count < 0 || count > 100) {
         std::cout << "Limit exceeded. Setting count to 100." << std::endl;
         return 100;
     }
     return std::max(0, count);
+}
+
+
+// Added Collision effect Xiao Hua Liu 02/25/2026
+void handleCollisions(std::vector<Particle> &p) {
+    
+    // Standard double for-loop to check every unique pair
+    for (std::size_t i = 0; i < p.size(); ++i) {
+        for (std::size_t j = i + 1; j < p.size(); ++j) {
+            
+            // Calculate distance between centers
+            Eigen::Vector2f relative_pos = p[i].position - p[j].position;
+            float dist = relative_pos.norm();
+            float min_dist = p[i].radius + p[j].radius;
+
+            // Check if particles are overlapping
+            if (dist < min_dist) {
+                // 1. Static Resolution: Push particles apart so they don't get stuck
+                float overlap = 1.0f * (min_dist - dist);
+                Eigen::Vector2f normal = relative_pos.normalized();
+                
+                p[i].position += normal * overlap;
+                p[j].position -= normal * overlap;
+
+                // 2. Dynamic Resolution: Calculate elastic bounce
+                Eigen::Vector2f relative_vel = p[i].velocity - p[j].velocity;
+                float vel_along_normal = relative_vel.dot(normal);
+
+                // Only resolve if they are actually moving toward each other
+                if (vel_along_normal < 0) {
+                    float restitution = 1.0f; // 1.0 = perfect bounce, 0.0 = clay-like
+                    float impulse_mag = -(1.0f + restitution) * vel_along_normal;
+                    impulse_mag /= (1.0f / p[i].mass + 1.0f / p[j].mass);
+
+                    Eigen::Vector2f impulse = impulse_mag * normal;
+                    p[i].velocity += (1.0f / p[i].mass) * impulse;
+                    p[j].velocity -= (1.0f / p[j].mass) * impulse;
+                }
+            }
+        }
+    }
 }

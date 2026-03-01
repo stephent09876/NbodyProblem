@@ -28,7 +28,8 @@ set(SOURCES
     src/NBodyProblem.cpp
     src/Particle.cpp
     src/Integrator.cpp
-    src/Gravity.cpp)
+    src/Gravity.cpp
+    src/SimulationValidation.cpp)
 
 add_executable(nBodyProject ${SOURCES})
 target_include_directories(nBodyProject PRIVATE include)

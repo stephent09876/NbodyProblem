@@ -9,6 +9,19 @@ This guide will help you set up the repository from scratch. I used a clean inst
 Ubuntu 24.04 installed to develop this project but CMake should work no matter your operating 
 system.
 
+## Available Features:
+To make sure you are running the correct commit hash for each submission, we have tagged commit
+commit hashes at the end of each sprint.
+
+For feature 1 run: 
+```
+    git checkout Feature_1
+```
+and similarly for feature 2:
+```
+    git checkout Feature_2
+```
+
 ## Compilation and Run guide:
 This is the preferred method to compile the code because of the ease of using CMake no matter the 
 development environment. This method uses the template SFML project repository here:
