@@ -38,7 +38,7 @@ int getParticleCount();
 float G = 100;
 
 // numerical integrator that is used to propagate the particle states (change at will here)
-IntegrationMode integ_mode_slct = IntegrationMode::Leapfrog;
+IntegrationMode integ_mode_slct = IntegrationMode::RK4;
 
 // size of window that SFML will generate
 Eigen::Vector<unsigned int, 2> window_size {1300, 800};

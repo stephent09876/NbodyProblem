@@ -23,7 +23,8 @@ Integrator::Integrator(IntegrationMode mode_in,
                        std::vector<Particle> &p_in, 
                        float G_in) :
                        gravity(p_in, G_in) ,
-                       integration_mode(mode_in) {}
+                       integration_mode(mode_in),
+                       NUM_PARTICLES(p_in.size()) {}
 
 
 void Integrator::update(float dt) {
@@ -61,8 +62,6 @@ void Integrator::EulerStep(float dt) {
 
 void Integrator::LeapFrog(float dt) {
 
-   std::cout << "I am in leapfrog" << std::endl;
-    
     // calculate position
     for (Particle &p : gravity.p) {
         p.position += p.velocity*dt + 0.5*p.accel*std::pow(dt, 2.0);
@@ -84,5 +83,24 @@ void Integrator::LeapFrog(float dt) {
 }
 
 void Integrator::RK4(float dt) {
-    /// TODO: implement RK4 integrator 
+
+    // initialize K constants
+    Eigen::VectorXf K1(gravity.p.size()*4);
+    Eigen::VectorXf K2(gravity.p.size()*4);
+    Eigen::VectorXf K3(gravity.p.size()*4);
+    Eigen::VectorXf K4(gravity.p.size()*4);
+
+    int midpoint = gravity.p.size() - 1;
+
+    
+    // compute K1
+    gravity.update();
+
+    for (std::size_t idx = 0; idx < gravity.p.size(); idx++) {
+        K1[2*idx]   = gravity.p[idx].velocity[0];
+        K1[2*idx+1] = gravity.p[idx].velocity[1];
+
+        K1[midpoint + 2*idx]   = gravity.p[idx].accel[0];
+        K1[midpoint + 2*idx+1] = gravity.p[idx].accel[1];
+    }
 }

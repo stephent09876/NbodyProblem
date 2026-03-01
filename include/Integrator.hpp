@@ -49,6 +49,8 @@ private:
     // Gravity model
     GravityModel gravity;
 
+    const int NUM_PARTICLES;
+
     // supporting variable for the leapfrog acceleration
     Eigen::Matrix<float, 100, 2> prev_accel;
 
