@@ -24,7 +24,7 @@
 
 enum class IntegrationMode {
     EulerStep = 0,
-    Leapfrog  = 1,
+    LeapFrog  = 1,
     RK4       = 2
 };
 
@@ -44,7 +44,7 @@ private:
 
    // Integration mode (CAUTION: this is changed to whatever the user set in MAIN at construction 
    // time!)
-   IntegrationMode integration_mode = IntegrationMode::Leapfrog;
+   IntegrationMode integration_mode = IntegrationMode::LeapFrog;
 
     // Gravity model
     GravityModel gravity;

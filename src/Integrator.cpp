@@ -40,13 +40,12 @@ void Integrator::update(float dt) {
             break;
 
         default:
-        case IntegrationMode::Leapfrog:
+        case IntegrationMode::LeapFrog:
             LeapFrog(dt);
             break;
     }
     
 }
-
 
 
 void Integrator::EulerStep(float dt) {
@@ -59,6 +58,7 @@ void Integrator::EulerStep(float dt) {
         p.position += p.velocity * dt;
     }
 }
+
 
 void Integrator::LeapFrog(float dt) {
 
@@ -82,15 +82,46 @@ void Integrator::LeapFrog(float dt) {
 
 }
 
+
 void Integrator::RK4(float dt) {
 
-    // initialize K constants
-    Eigen::VectorXf K1(gravity.p.size()*4);
-    Eigen::VectorXf K2(gravity.p.size()*4);
-    Eigen::VectorXf K3(gravity.p.size()*4);
-    Eigen::VectorXf K4(gravity.p.size()*4);
+    /********************************************************************************
+     * STATE VECTOR
+     * Each particle has a position: [x, y], velocity: [vx, vy] and acceleration: [ax, ay]
+     * The total size of the state vector then becomes 4N where the state vector, X, gets constructed 
+     * as follows:
+     * 
+     * X = [x_1, y_1, x_2, y_2, ... x_n, y_n, vx_1, vy_1, ..., vx_n, vy_n]
+     * 
+     * It should follow for a simulation of 20 particles, the state vector is of size 80 for example.
+     * The time derivative of the state vector, Xdot, then becomes:
+     * 
+     * Xdot = [vx_1, vy_1, ..., vx_n, vy_n, ax_1, ay_1, ..., ax_n, ay_n]
+     * 
+     * The time derivative then forms the basis of whats being calculated with the K variables
+     ********************************************************************************/
 
-    int midpoint = gravity.p.size() - 1;
+    /// TODO: this will probably break anytime num_particles < 2
+
+    int state_vector_size = gravity.p.size()*4;
+
+    // RK4 state vector at the current time step.
+    Eigen::VectorXf Xk(state_vector_size);
+
+    // RK4 state vector at the future time step
+    Eigen::VectorXf xkplus1(state_vector_size);
+
+    // initialize K variables
+    Eigen::VectorXf K1(state_vector_size);
+    Eigen::VectorXf K2(state_vector_size);
+    Eigen::VectorXf K3(state_vector_size);
+    Eigen::VectorXf K4(state_vector_size);
+
+    int midpoint = state_vector_size/2;
+
+    std::cout << midpoint << std::endl;
+
+    /// TODO: save off the current particle's state
 
     
     // compute K1
