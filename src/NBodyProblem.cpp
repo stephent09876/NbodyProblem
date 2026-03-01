@@ -7,7 +7,7 @@
  *          Shahzaib Memon
  * 
  * Description: This is the main execution script of the N Body Problem project being developed for
- *              Sprint 2026 SWEN 5239 Group XX. The following code sets up a simulation where a
+ *              Sprint 2026 SWEN 5239 Group 7. The following code sets up a simulation where a
  *              system of particles gravitationally interact with each other via newtons gravity
  *              equation. A graphics library is used to render the particles on the screen and a 
  *              user specified choice of numerical integrator (choices of Euler, Leapfrog, or RK4)
@@ -35,7 +35,9 @@ int getParticleCount();
 /// calculates the gravitational acceleration for each individual particle.
 /// @param p vector of particles
 void gravityModel(std::vector<Particle> &p);
+void handleCollisions(std::vector<Particle> &p);
 
+bool collision_enabled=true;
 
 // ------------------- Simulation Variables -------------------------------------
 
@@ -128,7 +130,7 @@ int main() {
 
             // poll for button press event
             if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
-                if (mouseButtonPressed ->button == sf::Mouse::Button::Left) {
+                if (mouseButtonPressed->button == sf::Mouse::Button::Left) {
                     mouse_button_pressed = true;
                 }
             }
@@ -157,6 +159,11 @@ int main() {
         // Update Particle State
         if (sim_mode == SimulationMode::Running) {
             gravityModel(particles);
+            
+            //  calculate collision
+            if (collision_enabled == true) {
+                handleCollisions(particles);
+            }
 
             for (Particle& p : particles) {
                 p.update(dt);
@@ -189,14 +196,14 @@ int getParticleCount() {
     if (!(std::cin >> count)) return 0;
     
     // Limit to 100 particles as requested
-    if (count > 100) {
+    if (count < 0 || count > 100) {
         std::cout << "Limit exceeded. Setting count to 100." << std::endl;
         return 100;
     }
     return std::max(0, count);
 }
 
-
+// Original code before adding collision effect - Xiao Hua Liu 02/24/2026
 void gravityModel(std::vector<Particle> &p) {
     for (std::size_t idx = 0; idx < p.size(); idx++) {
 
@@ -226,5 +233,45 @@ void gravityModel(std::vector<Particle> &p) {
         }
 
         p[idx].accel = accel;
+    }
+}
+
+// Added Collision effect Xiao Hua Liu 02/25/2026
+void handleCollisions(std::vector<Particle> &p) {
+    
+    // Standard double for-loop to check every unique pair
+    for (std::size_t i = 0; i < p.size(); ++i) {
+        for (std::size_t j = i + 1; j < p.size(); ++j) {
+            
+            // Calculate distance between centers
+            Eigen::Vector2f relative_pos = p[i].position - p[j].position;
+            float dist = relative_pos.norm();
+            float min_dist = p[i].radius + p[j].radius;
+
+            // Check if particles are overlapping
+            if (dist < min_dist) {
+                // 1. Static Resolution: Push particles apart so they don't get stuck
+                float overlap = 1.0f * (min_dist - dist);
+                Eigen::Vector2f normal = relative_pos.normalized();
+                
+                p[i].position += normal * overlap;
+                p[j].position -= normal * overlap;
+
+                // 2. Dynamic Resolution: Calculate elastic bounce
+                Eigen::Vector2f relative_vel = p[i].velocity - p[j].velocity;
+                float vel_along_normal = relative_vel.dot(normal);
+
+                // Only resolve if they are actually moving toward each other
+                if (vel_along_normal < 0) {
+                    float restitution = 1.0f; // 1.0 = perfect bounce, 0.0 = clay-like
+                    float impulse_mag = -(1.0f + restitution) * vel_along_normal;
+                    impulse_mag /= (1.0f / p[i].mass + 1.0f / p[j].mass);
+
+                    Eigen::Vector2f impulse = impulse_mag * normal;
+                    p[i].velocity += (1.0f / p[i].mass) * impulse;
+                    p[j].velocity -= (1.0f / p[j].mass) * impulse;
+                }
+            }
+        }
     }
 }
