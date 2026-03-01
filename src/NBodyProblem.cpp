@@ -7,7 +7,7 @@
  *          Shahzaib Memon
  * 
  * Description: This is the main execution script of the N Body Problem project being developed for
- *              Sprint 2026 SWEN 5239 Group XX. The following code sets up a simulation where a
+ *              Sprint 2026 SWEN 5239 Group 7. The following code sets up a simulation where a
  *              system of particles gravitationally interact with each other via newtons gravity
  *              equation. A graphics library is used to render the particles on the screen and a 
  *              user specified choice of numerical integrator (choices of Euler, Leapfrog, or RK4)
@@ -130,7 +130,7 @@ int main() {
 
             // poll for button press event
             if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
-                if (mouseButtonPressed ->button == sf::Mouse::Button::Left) {
+                if (mouseButtonPressed->button == sf::Mouse::Button::Left) {
                     mouse_button_pressed = true;
                 }
             }
@@ -159,10 +159,12 @@ int main() {
         // Update Particle State
         if (sim_mode == SimulationMode::Running) {
             gravityModel(particles);
+            
             //  calculate collision
             if (collision_enabled == true) {
-            handleCollisions(particles);
+                handleCollisions(particles);
             }
+
             for (Particle& p : particles) {
                 p.update(dt);
             }
@@ -234,8 +236,9 @@ void gravityModel(std::vector<Particle> &p) {
     }
 }
 
-//Added Collision effect Xiao Hua Liu 02/25/2026
+// Added Collision effect Xiao Hua Liu 02/25/2026
 void handleCollisions(std::vector<Particle> &p) {
+    
     // Standard double for-loop to check every unique pair
     for (std::size_t i = 0; i < p.size(); ++i) {
         for (std::size_t j = i + 1; j < p.size(); ++j) {
