@@ -1,6 +1,6 @@
 /**************************************************************************************************
- * File: Particle2.cpp
- * Date: 2/15/2025
+ * File: Particle.cpp
+ * Date: 2/15/2026
  * Description: This file implements the particle class that is compilable with SFML 3.0
  **************************************************************************************************/
 
@@ -21,11 +21,7 @@ Particle::Particle(float m,
         shape.setFillColor(color);
     }
 
-void Particle::update(float deltaTime) {
-    // Linear motion: P_new = P_old + V * dt
-    velocity += accel * deltaTime;
-    position += velocity * deltaTime;
-
+void Particle::update() {
 
     // Boundary bouncing logic (Window: 1300x800)
     if (position.x() < 0 || position.x() > 1300) velocity.x() *= -1.0f;

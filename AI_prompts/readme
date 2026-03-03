@@ -1,9 +1,6 @@
 This folder will contain all ai prompts used to help with code scaffolding and debugging. This file
 will provide explanation how the individual prompt files help assist us with this project
 
-
-FEATURE 1 AI USAGE:
-
 stephen_thorsell_library_recommendations.pdf:
 This AI prompt was used to help me get a feeling of what supporting libraries I needed to complete
 this project. I initially thought that OpenGL for the graphics and Eigen for the linear algebra
@@ -22,10 +19,28 @@ This AI prompt was to help me install the Eigen linear algebra library. The SFML
 repository that I pulled had the SFML installation built into the CMakeLists.txt file already but
 I had no idea how to add an extra repository to install in this manner.
 
-
-FEATURE 2 AI USAGE:
-
 Help_with_pause_resume_user_story.pdf: 
 This AI prompt helped design the pause play button functionality. Some of the 
 code is meant for old SFML 2.6.1 version and was modified for the current version
 of the graphics library.
+
+
+rk4_for_nbody.pdf:
+This AI prompt helped figure out the big design questions of the RK4 numerical integrator. Mainly,
+I needed help conceptually if I could have multiple state vectors for each of the particles or do
+I need one singular state vector that combines the states of all the particles together. I also
+needed help with figuring out how the Eigen::vector types could be dynamically allocated.
+(WARNING: This pdf is not rendering properly in the vscode pdf reader and you might need to download
+it to see all of the content correctly.)
+
+Feature 2 Unified Mass, coloor, acceleration AI Usage.pdf:
+This AI prompt helped create a boilerplate simulation framework that contained all necessary steps
+to initialize and run the simulation. It also helped standardize the particles to be identical 
+which was a departure from feature 1 where particles had random sizes, masses, and colors.
+
+add_collision_effect_AI_Usage.pdf:
+This AI prompt helped with the collision physics feature. It wrote a small collision detection and 
+rectification subroutine and included an optional section on static particle rectification. (This
+was eventually removed from the simulation as this would add a lot of energy breaking energy 
+conservation.)
+

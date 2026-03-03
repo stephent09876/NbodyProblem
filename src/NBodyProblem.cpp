@@ -24,6 +24,7 @@
 // Internal project includes
 #include "Particle.hpp"
 #include "SimulationMode.hpp"
+#include "Integrator.hpp"
 #include "SimulationValidation.hpp"
 
 // ---------------- Individual function declarations ---------------------------
@@ -32,19 +33,25 @@
 /// particles to be ran in the simulation
 int getParticleCount();
 
-/// @brief gravityModel - The Newtownian gravity model. Runs through a list of particles and
-/// calculates the gravitational acceleration for each individual particle.
-/// @param p vector of particles
-void gravityModel(std::vector<Particle> &p);
 void handleCollisions(std::vector<Particle> &p);
 
-bool collision_enabled=true;
 
-// ------------------- Simulation Variables -------------------------------------
+
+// ------------------- Set Simulation Variables -------------------------------------
 
 // universal gravity constant. Tune to modify simulation response [unitless]
 float G = 100;
+
+// If total particle energy drift by this amount, a warning message will display
 double energy_drift_threshold_percent = 5.0;
+
+// Enable switch for collision physics
+bool collision_enabled = true;
+
+int sim_frame_rate = 60;
+
+// numerical integrator that is used to propagate the particle states (change at will here)
+IntegrationMode integ_mode_slct = IntegrationMode::LeapFrog;
 
 // size of window that SFML will generate
 Eigen::Vector<unsigned int, 2> window_size {1300, 800};
@@ -57,15 +64,21 @@ int main() {
 
     int numParticles = getParticleCount();
 
+ 
+
     sf::RenderWindow window(sf::VideoMode({window_size[0], window_size[1]}), "N-Body Gravity Simulation");
-    window.setFramerateLimit(60);
+    window.setFramerateLimit(sim_frame_rate);
+    window.setPosition(sf::Vector2i{100, 100});
+
+    // compute sim_time step
+    float dt = 1.0 / static_cast<float>(sim_frame_rate);
 
     // Setup Randomness
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> posWidth(100.0f, 1200.0f);
     std::uniform_real_distribution<float> posHeight(100.0f, 700.0f);
-    std::uniform_real_distribution<float> velDist(-0.0f, 0.0f);
+    std::uniform_real_distribution<float> velDist(-0.01f, 0.01f);
 
     // Initialize Particle Vector
     std::vector<Particle> particles;
@@ -82,6 +95,9 @@ int main() {
                                window_size.cast<float>());
                                
     }
+
+    // initialize gravity model TEMPORARY: EVENTUALLY THIS WILL BE THE INTEGRATOR CLASS
+    Integrator integrator(integ_mode_slct, particles, G);
 
     // set up a clock to track elapsed simulation time
     sf::Clock clock;
@@ -125,7 +141,6 @@ int main() {
 
         // log time
         sf::Time dtTime = clock.restart();
-        float dt = dtTime.asSeconds();
         totalTime += dtTime;
 
         // Check for 5-minute timeout (300 seconds)
@@ -170,20 +185,22 @@ int main() {
             }
         }
 
-        // Update Particle State
+        
         if (sim_mode == SimulationMode::Running) {
-            gravityModel(particles);
-            
-            //  calculate collision
-            if (collision_enabled == true) {
+
+            //  calculate collisions
+            if (collision_enabled) {
                 handleCollisions(particles);
             }
 
+            integrator.update(dt);  // Step particle simulation with gravity model
+            
             for (Particle& p : particles) {
-                p.update(dt);
+                p.update();
             }
         }
 
+        // check energy conservation
         const ValidationState currentValidationState = computeValidationState(particles, G);
         const ValidationResult validation = evaluateValidation(initialValidationState,
                                                               currentValidationState,
@@ -227,38 +244,6 @@ int getParticleCount() {
     return std::max(0, count);
 }
 
-// Original code before adding collision effect - Xiao Hua Liu 02/24/2026
-void gravityModel(std::vector<Particle> &p) {
-    for (std::size_t idx = 0; idx < p.size(); idx++) {
-
-        // reset acceleration vector
-        Eigen::Vector2f accel{0.0, 0.0};
-
-        for (std::size_t jdx = 0; jdx < p.size(); jdx++) {
-
-            // skip if the ith particle and jth particle are the same
-            if (idx == jdx) {
-                continue;
-            }
-
-            Eigen::Vector2f r_ji;
-            float           r_mag;
-
-            // calculate position vector from the jth particle to the ith particle
-            r_ji = p[idx].position - p[jdx].position;
-            r_mag = r_ji.norm();
-
-            if (r_mag < 2.0 * p[idx].radius) {
-                continue;  // dont calculate an acceleration between these particles if they're too close
-            }
-
-            // Calculate gravitational acceleration (minus sign is on purpose via chosen convention)
-            accel -= 1.0 * G * p[jdx].mass / std::pow(r_mag, 3) * r_ji; 
-        }
-
-        p[idx].accel = accel;
-    }
-}
 
 // Added Collision effect Xiao Hua Liu 02/25/2026
 void handleCollisions(std::vector<Particle> &p) {
@@ -272,14 +257,8 @@ void handleCollisions(std::vector<Particle> &p) {
             float dist = relative_pos.norm();
             float min_dist = p[i].radius + p[j].radius;
 
-            // Check if particles are overlapping
             if (dist < min_dist) {
-                // 1. Static Resolution: Push particles apart so they don't get stuck
-                float overlap = 1.0f * (min_dist - dist);
                 Eigen::Vector2f normal = relative_pos.normalized();
-                
-                p[i].position += normal * overlap;
-                p[j].position -= normal * overlap;
 
                 // 2. Dynamic Resolution: Calculate elastic bounce
                 Eigen::Vector2f relative_vel = p[i].velocity - p[j].velocity;
