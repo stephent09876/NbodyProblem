@@ -48,6 +48,8 @@ double energy_drift_threshold_percent = 5.0;
 // Enable switch for collision physics
 bool collision_enabled = true;
 
+int sim_frame_rate = 60;
+
 // numerical integrator that is used to propagate the particle states (change at will here)
 IntegrationMode integ_mode_slct = IntegrationMode::LeapFrog;
 
@@ -65,8 +67,11 @@ int main() {
  
 
     sf::RenderWindow window(sf::VideoMode({window_size[0], window_size[1]}), "N-Body Gravity Simulation");
-    window.setFramerateLimit(60);
+    window.setFramerateLimit(sim_frame_rate);
     window.setPosition(sf::Vector2i{100, 100});
+
+    // compute sim_time step
+    float dt = 1.0 / static_cast<float>(sim_frame_rate);
 
     // Setup Randomness
     std::random_device rd;
@@ -136,7 +141,6 @@ int main() {
 
         // log time
         sf::Time dtTime = clock.restart();
-        float dt = dtTime.asSeconds();
         totalTime += dtTime;
 
         // Check for 5-minute timeout (300 seconds)
@@ -181,20 +185,22 @@ int main() {
             }
         }
 
-        // Update Particle State with gravity
+        
         if (sim_mode == SimulationMode::Running) {
-            integrator.update(dt);
-            
-            //  calculate collision
+
+            //  calculate collisions
             if (collision_enabled) {
                 handleCollisions(particles);
             }
 
+            integrator.update(dt);  // Step particle simulation with gravity model
+            
             for (Particle& p : particles) {
                 p.update();
             }
         }
 
+        // check energy conservation
         const ValidationState currentValidationState = computeValidationState(particles, G);
         const ValidationResult validation = evaluateValidation(initialValidationState,
                                                               currentValidationState,
@@ -251,14 +257,8 @@ void handleCollisions(std::vector<Particle> &p) {
             float dist = relative_pos.norm();
             float min_dist = p[i].radius + p[j].radius;
 
-            // Check if particles are overlapping
             if (dist < min_dist) {
-                // 1. Static Resolution: Push particles apart so they don't get stuck
-                float overlap = 1.0f * (min_dist - dist);
                 Eigen::Vector2f normal = relative_pos.normalized();
-                
-                p[i].position += normal * overlap;
-                p[j].position -= normal * overlap;
 
                 // 2. Dynamic Resolution: Calculate elastic bounce
                 Eigen::Vector2f relative_vel = p[i].velocity - p[j].velocity;
