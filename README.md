@@ -17,9 +17,13 @@ For feature 1 run:
 ```
     git checkout Feature_1
 ```
-and similarly for feature 2:
+for feature 2:
 ```
     git checkout Feature_2
+```
+and finally for the final project submission:
+```
+    git checkout Final_submission
 ```
 
 ## Compilation and Run guide:
