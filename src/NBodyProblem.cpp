@@ -53,9 +53,6 @@ int sim_frame_rate = 60;
 // numerical integrator that is used to propagate the particle states (change at will here)
 IntegrationMode integ_mode_slct = IntegrationMode::LeapFrog;
 
-// size of window that SFML will generate
-Eigen::Vector<unsigned int, 2> window_size {1300, 800};
-
 
 // -------------------- MAIN FUNCTION -------------------------------------------
 int main() {
@@ -63,9 +60,9 @@ int main() {
     // ------------------- SIMULATION INITIALIZATION ----------------------------
 
     int numParticles = getParticleCount();
-
  
-
+    // size of window that SFML will generate
+    Eigen::Vector<unsigned int, 2> window_size {1300, 800};
     sf::RenderWindow window(sf::VideoMode({window_size[0], window_size[1]}), "N-Body Gravity Simulation");
     window.setFramerateLimit(sim_frame_rate);
     window.setPosition(sf::Vector2i{100, 100});
