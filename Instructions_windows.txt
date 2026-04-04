@@ -60,3 +60,10 @@ This will build the project.
 
 11. Run the executable
     ./nBodyProject
+
+12. Next to ensure you can modify and work in your WSL environment, you will download the wsl extension in VS code
+    Extentions > WSL > install
+
+13. Navigate to the repository/directory in WSL and type the following command:
+    code .
+-this may install some dependecies but should just open vscode with WSL:Ubuntu showing in the bottom left.
