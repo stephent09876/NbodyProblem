@@ -26,16 +26,7 @@
 #include "SimulationMode.hpp"
 #include "Integrator.hpp"
 #include "SimulationValidation.hpp"
-
-// ---------------- Individual function declarations ---------------------------
-
-/// @brief  getParticleCount - prompt a user input where the user specifies the total number of
-/// particles to be ran in the simulation
-int getParticleCount();
-
-void handleCollisions(std::vector<Particle> &p);
-
-
+#include "TestingUtils.hpp"
 
 // ------------------- Set Simulation Variables -------------------------------------
 
@@ -48,16 +39,86 @@ double energy_drift_threshold_percent = 5.0;
 // Enable switch for collision physics
 bool collision_enabled = true;
 
+// Simulation frame rate (FPS)
 int sim_frame_rate = 60;
 
-// numerical integrator that is used to propagate the particle states (change at will here)
-IntegrationMode integ_mode_slct = IntegrationMode::LeapFrog;
+// ---------------------- SUPPORTING FUNCTIONS -------------------------------------
 
+int getParticleCount() {
+    int count;
+    std::cout << "Enter the number of particles (Max 100): ";
+    if (!(std::cin >> count)) return 0;
+    
+    // Limit to 100 particles as requested
+    if (count < 0 || count > 100) {
+        std::cout << "Limit exceeded. Setting count to 100." << std::endl;
+        return 100;
+    }
+    return std::max(0, count);
+}
+
+IntegrationMode getIntegrationMode() {
+    std::cout << "Select Integration Method:\n";
+    std::cout << "1. Euler\n";
+    std::cout << "2. LeapFrog\n";
+    std::cout << "3. RK4\n";
+
+    int choice = 0;
+    while (true) {
+        std::cout << "Enter choice (1-3): ";
+        std::cin >> choice;
+
+        if (choice == 1) return IntegrationMode::EulerStep;
+        if (choice == 2) return IntegrationMode::LeapFrog;
+        if (choice == 3) return IntegrationMode::RK4;
+
+        std::cout << "Invalid selection. Try again.\n";
+    }
+}
+
+// Added Collision effect Xiao Hua Liu 02/25/2026
+void handleCollisions(std::vector<Particle> &p) {
+    
+    // Standard double for-loop to check every unique pair
+    for (std::size_t i = 0; i < p.size(); ++i) {
+        for (std::size_t j = i + 1; j < p.size(); ++j) {
+            
+            // Calculate distance between centers
+            Eigen::Vector2f relative_pos = p[i].position - p[j].position;
+            float dist = relative_pos.norm();
+            float min_dist = p[i].radius + p[j].radius;
+
+            if (dist < min_dist) {
+                Eigen::Vector2f normal = relative_pos.normalized();
+
+                // 2. Dynamic Resolution: Calculate elastic bounce
+                Eigen::Vector2f relative_vel = p[i].velocity - p[j].velocity;
+                float vel_along_normal = relative_vel.dot(normal);
+
+                // Only resolve if they are actually moving toward each other
+                if (vel_along_normal < 0) {
+                    float restitution = 1.0f; // 1.0 = perfect bounce, 0.0 = clay-like
+                    float impulse_mag = -(1.0f + restitution) * vel_along_normal;
+                    impulse_mag /= (1.0f / p[i].mass + 1.0f / p[j].mass);
+
+                    Eigen::Vector2f impulse = impulse_mag * normal;
+                    p[i].velocity += (1.0f / p[i].mass) * impulse;
+                    p[j].velocity -= (1.0f / p[j].mass) * impulse;
+                }
+            }
+        }
+    }
+}
 
 // -------------------- MAIN FUNCTION -------------------------------------------
 int main() {
 
     // ------------------- SIMULATION INITIALIZATION ----------------------------
+
+    // numerical integrator that is used to propagate the particle states (change at will here)
+    IntegrationMode integ_mode_slct = getIntegrationMode();
+
+    runEdgeCaseTests(integ_mode_slct);
 
     int numParticles = getParticleCount();
  
@@ -194,6 +255,7 @@ int main() {
             
             for (Particle& p : particles) {
                 p.update();
+                //p.log(); // Log particle state to console for debugging/validation
             }
         }
 
@@ -226,52 +288,4 @@ int main() {
     return 0;
 }
 
-// ---------------------- SUPPORTING FUNCTIONS -------------------------------------
 
-int getParticleCount() {
-    int count;
-    std::cout << "Enter the number of particles (Max 100): ";
-    if (!(std::cin >> count)) return 0;
-    
-    // Limit to 100 particles as requested
-    if (count < 0 || count > 100) {
-        std::cout << "Limit exceeded. Setting count to 100." << std::endl;
-        return 100;
-    }
-    return std::max(0, count);
-}
-
-
-// Added Collision effect Xiao Hua Liu 02/25/2026
-void handleCollisions(std::vector<Particle> &p) {
-    
-    // Standard double for-loop to check every unique pair
-    for (std::size_t i = 0; i < p.size(); ++i) {
-        for (std::size_t j = i + 1; j < p.size(); ++j) {
-            
-            // Calculate distance between centers
-            Eigen::Vector2f relative_pos = p[i].position - p[j].position;
-            float dist = relative_pos.norm();
-            float min_dist = p[i].radius + p[j].radius;
-
-            if (dist < min_dist) {
-                Eigen::Vector2f normal = relative_pos.normalized();
-
-                // 2. Dynamic Resolution: Calculate elastic bounce
-                Eigen::Vector2f relative_vel = p[i].velocity - p[j].velocity;
-                float vel_along_normal = relative_vel.dot(normal);
-
-                // Only resolve if they are actually moving toward each other
-                if (vel_along_normal < 0) {
-                    float restitution = 1.0f; // 1.0 = perfect bounce, 0.0 = clay-like
-                    float impulse_mag = -(1.0f + restitution) * vel_along_normal;
-                    impulse_mag /= (1.0f / p[i].mass + 1.0f / p[j].mass);
-
-                    Eigen::Vector2f impulse = impulse_mag * normal;
-                    p[i].velocity += (1.0f / p[i].mass) * impulse;
-                    p[j].velocity -= (1.0f / p[j].mass) * impulse;
-                }
-            }
-        }
-    }
-}

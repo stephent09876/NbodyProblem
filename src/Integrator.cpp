@@ -61,7 +61,7 @@ void Integrator::EulerStep(float dt) {
     for (Particle &p : gravity.p) {
         p.velocity += p.accel * dt;
         p.position += p.velocity * dt;
-        p.log();
+        //p.log();
     }
 }
 

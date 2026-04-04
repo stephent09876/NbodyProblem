@@ -36,7 +36,7 @@ public:
              Eigen::Vector2f pos, 
              Eigen::Vector2f vel, 
              Eigen::Vector2f bounds,
-            id = std::rand());
+             int id = std::rand());
 
     // update function
     void update();
