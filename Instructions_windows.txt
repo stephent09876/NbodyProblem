@@ -1,0 +1,69 @@
+1. In stall WSL (Windows Subsystem for Linux)
+Open PowerShell as admin and run:
+    wsl --install
+
+2. Check if any distro is installed
+run command in PowerShell:
+    wsl -l -v
+If it says "No installed distributions" we will need to install one.
+
+You can see all available distributions by running the command in PowerShell:
+    wsl --list --online
+I will chose to install Ubuntu
+
+3. Install Ubuntu
+Open PowerShell as admin and run:
+    wsl --install -d Ubuntu
+
+4. Once the distribution is installed it will ask you to create a user account and password.
+
+5. From here you will have Ubuntu ready so start a terminal up from your start menu.
+Start > Ubuntu
+6. From here run these commands to get the project dependecies:
+
+sudo apt update
+
+sudo apt install g++ cmake make
+
+sudo apt install \
+    libxrandr-dev \
+    libxcursor-dev \
+    libxi-dev \
+    libudev-dev \
+    libfreetype-dev \
+    libflac-dev \
+    libvorbis-dev \
+    libgl1-mesa-dev \
+    libegl1-mesa-dev
+
+7. Its likely that you will need to set up and clone the repository into your new WSL environment. You can technically access your windows files through the file system, but it's faster and easier to access it through WSL. 
+make a repos directory
+    mkdir repos
+move into the directory
+    cd repos
+clone this repository into you repo dir
+    git clone https://github.com/stephent09876/NbodyProblem.git
+
+8. You'll want to jump into the repository directory now
+    cd NbodyProblem
+
+9. Stephen was nice enough to set up some aliases to help build the project. The script is in the bin folder but you can source it from the project root directory like this:
+    source bin/alias.sh
+
+    this sets up cmCP ('cmake -B build ; cmake --build build')
+    also git status as gs
+    and make spotless as ms
+
+10. From here you'll run the cmCP alias from the root of the project
+    cmCP
+This will build the project.
+
+11. Run the executable
+    ./nBodyProject
+
+12. Next to ensure you can modify and work in your WSL environment, you will download the wsl extension in VS code
+    Extentions > WSL > install
+
+13. Navigate to the repository/directory in WSL and type the following command:
+    code .
+-this may install some dependecies but should just open vscode with WSL:Ubuntu showing in the bottom left.

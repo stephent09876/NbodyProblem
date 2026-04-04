@@ -14,6 +14,8 @@
 class Particle {
 public:
 
+    int id;
+
     // state vectors
     Eigen::Vector2f position {0.0, 0.0};
     Eigen::Vector2f velocity {0.0, 0.0};
@@ -33,9 +35,19 @@ public:
              sf::Color color, 
              Eigen::Vector2f pos, 
              Eigen::Vector2f vel, 
-             Eigen::Vector2f bounds);
+             Eigen::Vector2f bounds,
+             int id = std::rand());
 
     // update function
     void update();
     
+    void log() const {
+        std::cout << "Particle ID: " << id << "\n"
+                  << "  Position: (" << position.x() << ", " << position.y() << ")\n"
+                  << "  Velocity: (" << velocity.x() << ", " << velocity.y() << ")\n"
+                  << "  Accel:    (" << accel.x()    << ", " << accel.y()    << ")\n"
+                  << "  Mass: " << mass << "\n"
+                  << "  Radius: " << radius << "\n"
+                  << "----------------------------------\n";
+    }
 };

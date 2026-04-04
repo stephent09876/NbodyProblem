@@ -11,8 +11,9 @@ Particle::Particle(float m,
                    sf::Color color, 
                    Eigen::Vector2f pos, 
                    Eigen::Vector2f vel, 
-                   Eigen::Vector2f bounds) 
-        : mass(m), position(pos), velocity(vel), boundary{bounds} {
+                   Eigen::Vector2f bounds,
+                   int id) 
+        : mass(m), position(pos), velocity(vel), boundary{bounds}, id(id) {
         
         // Visual representation setup
         radius = std::sqrt(mass) * 2.0f;
