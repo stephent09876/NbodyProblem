@@ -8,6 +8,8 @@
 # Run tests:
 #       > ./test_integrator
 #################################################################################################
+add_compile_options(--coverage -O0 -g)
+add_link_options(--coverage)
 
 cmake_minimum_required(VERSION 3.28)
 project(unittestproject)
