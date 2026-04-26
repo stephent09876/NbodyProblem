@@ -45,7 +45,7 @@ float computeTotalEnergy(const std::vector<Particle>& particles, float G) {
 // ------------------------------
 /// This function runs a simulation for a given number of steps and checks energy conservation by comparing the initial and final total energy. 
 // It uses both the computeTotalEnergy function and the ValidationState from the simulation to cross-validate results. 
-// The energy drift percentage is calculated to assess the stability of the integrator under the specified conditions.
+// The energy drift percentage is calculated to assess the stability of the integrator under the specified conditions.  ddd
 void runEnergyConservationTest(IntegrationMode mode, std::vector<Particle>& testParticles, float dt, int steps, float G_local) {
     std::cout << "=== Energy Conservation Test ===\n";
 
